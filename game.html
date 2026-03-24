@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Битва хранителей</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1a24;
+            color: #eee;
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #1e3a4a;
+            border-radius: 24px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .mana-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #00000066;
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: #ffd966;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #3a6b5b;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #4f8a76;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        button:disabled {
+            background: #2c4a3e;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .back-btn { background: #b85c1a; }
+        .back-btn:hover { background: #d46b1e; }
+        .end-turn-btn { background: #2c6e9e; }
+        .end-turn-btn:hover { background: #3580b8; }
+        .change-team-btn { background: #a12f2f; }
+        .change-team-btn:hover { background: #c23b3b; }
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .character-card {
+            background: #1e2f3a;
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+        }
+        .character-name {
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #ffcc88;
+        }
+        .hp-section {
+            background: #2a3f4a;
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .hp-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff7777;
+        }
+        .hp-control {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .hp-control input {
+            width: 80px;
+            padding: 10px;
+            border-radius: 30px;
+            border: none;
+            text-align: center;
+            font-size: 1rem;
+            background: #f0f0f0;
+        }
+        .abilities {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .ability-btn {
+            background: #3f5e6b;
+            width: 100%;
+            text-align: left;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+        }
+        .ability-name {
+            font-weight: bold;
+        }
+        .ability-cost {
+            background: #00000055;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .move-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #4a6a7a;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .move-section input {
+            width: 100px;
+            padding: 10px;
+            border-radius: 30px;
+            border: none;
+            text-align: center;
+            background: #f0f0f0;
+            font-size: 1rem;
+        }
+        .move-btn {
+            background: #6a4e3a;
+            flex: 1;
+            padding: 10px;
+        }
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .characters-grid { grid-template-columns: 1fr; gap: 16px; }
+            .character-name { font-size: 1.4rem; }
+            .hp-value { font-size: 1.3rem; }
+            .ability-btn { padding: 10px 12px; font-size: 0.9rem; }
+            .move-section input { width: 85px; }
+            button { padding: 8px 14px; font-size: 0.85rem; }
+            .mana-display { font-size: 1.2rem; }
+        }
+        .error-message {
+            background: #a12f2f;
+            color: white;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="mana-display">🌀 Мана: <span id="mana-value">0</span></div>
+        <div class="actions">
+            <button id="undo-btn" class="back-btn">↩️ Назад</button>
+            <button id="end-turn-btn" class="end-turn-btn">✨ Завершить ход</button>
+            <button id="change-team-btn" class="change-team-btn">🔄 Сменить команду</button>
+        </div>
+    </div>
+    <div id="characters-grid" class="characters-grid"></div>
+</div>
+
+<script>
+    (function() {
+        // Данные всех персонажей
+        const fullCharacters = [
+            { id: 1, name: "Темпос", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 2, name: "Гоуст", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 3, name: "Иллюжн", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 4, name: "Форс", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 5, name: "Вита", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 6, name: "Аюно", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 7, name: "Вампир", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 8, name: "Серпенс", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 9, name: "Ион", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 10, name: "Айси", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 11, name: "Друид", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 12, name: "Магмус", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 13, name: "Нано", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 14, name: "Кёрс", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 15, name: "Сайтер", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "ВИНТОВКА", mana: 10 },
+                { name: "Яростный рывок", mana: 5 }
+            ] }
+        ];
+
+        let selectedCharacters = [];
+        let currentMana = 15;
+        let charactersHP = {};
+        let actionHistory = [];
+
+        // Функция для отображения ошибки и кнопки возврата
+        function showError(message) {
+            const grid = document.getElementById('characters-grid');
+            grid.innerHTML = `<div class="error-message">
+                <strong>❌ Ошибка:</strong> ${message}<br><br>
+                <button id="force-back" style="background:#ffaa44; color:#1e2a36;">Вернуться к выбору команды</button>
+            </div>`;
+            document.getElementById('force-back').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        }
+
+        // Загрузка состояния
+        function loadGameState() {
+            const savedIds = localStorage.getItem('selectedCharacters');
+            if (!savedIds) {
+                showError('Не выбрана команда. Пожалуйста, выберите 5 персонажей на главной странице.');
+                return false;
+            }
+            let ids;
+            try {
+                ids = JSON.parse(savedIds);
+            } catch(e) {
+                showError('Ошибка чтения данных. Попробуйте выбрать команду заново.');
+                return false;
+            }
+            if (!Array.isArray(ids) || ids.length !== 5) {
+                showError('Выбрано не 5 персонажей. Вернитесь и выберите ровно 5.');
+                return false;
+            }
+            selectedCharacters = fullCharacters.filter(c => ids.includes(c.id));
+            if (selectedCharacters.length !== 5) {
+                showError('Не удалось загрузить выбранных персонажей. Попробуйте снова.');
+                return false;
+            }
+
+            const savedMana = localStorage.getItem('currentMana');
+            currentMana = savedMana !== null ? parseInt(savedMana, 10) : 15;
+
+            const savedHP = localStorage.getItem('charactersHP');
+            if (savedHP) {
+                try {
+                    charactersHP = JSON.parse(savedHP);
+                } catch(e) {
+                    charactersHP = {};
+                }
+            }
+            if (Object.keys(charactersHP).length === 0) {
+                selectedCharacters.forEach(ch => { charactersHP[ch.id] = ch.hp; });
+            }
+
+            const savedHistory = localStorage.getItem('actionHistory');
+            if (savedHistory) {
+                try {
+                    actionHistory = JSON.parse(savedHistory);
+                } catch(e) {
+                    actionHistory = [];
+                }
+            }
+            return true;
+        }
+
+        function persistState() {
+            localStorage.setItem('currentMana', currentMana);
+            localStorage.setItem('charactersHP', JSON.stringify(charactersHP));
+            localStorage.setItem('actionHistory', JSON.stringify(actionHistory));
+        }
+
+        function updateUI() {
+            const manaSpan = document.getElementById('mana-value');
+            if (manaSpan) manaSpan.textContent = currentMana;
+
+            document.querySelectorAll('.character-card').forEach(card => {
+                const charId = parseInt(card.dataset.id);
+                const char = selectedCharacters.find(c => c.id === charId);
+                if (!char) return;
+
+                card.querySelectorAll('.ability-btn').forEach((btn, idx) => {
+                    const cost = char.abilities[idx].mana;
+                    btn.disabled = currentMana < cost;
+                });
+
+                const moveBtn = card.querySelector('.move-btn');
+                const moveInput = card.querySelector('.move-cost');
+                if (moveBtn && moveInput) {
+                    const val = parseInt(moveInput.value, 10);
+                    moveBtn.disabled = isNaN(val) || val <= 0 || currentMana < val;
+                }
+            });
+        }
+
+        function renderCharacters() {
+            const grid = document.getElementById('characters-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            selectedCharacters.forEach(char => {
+                const currentHp = charactersHP[char.id] !== undefined ? charactersHP[char.id] : char.hp;
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                card.dataset.id = char.id;
+                card.innerHTML = `
+                    <div class="character-name">${char.name}</div>
+                    <div class="hp-section">
+                        <span class="hp-value">❤️ ${currentHp}</span>
+                        <div class="hp-control">
+                            <input type="number" class="hp-delta-input" placeholder="изм." value="0" step="1">
+                            <button class="hp-change-btn">Изменить здоровье</button>
+                        </div>
+                    </div>
+                    <div class="abilities">
+                        ${char.abilities.map((ab, idx) => `
+                            <button class="ability-btn" data-ability-index="${idx}">
+                                <span class="ability-name">${ab.name}</span>
+                                <span class="ability-cost">${ab.mana} маны</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="move-section">
+                        <input type="number" class="move-cost" placeholder="трата маны" value="1" step="1">
+                        <button class="move-btn">🚶 Движ</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            updateUI();
+        }
+
+        function handleGridClick(e) {
+            const target = e.target;
+            const card = target.closest('.character-card');
+            if (!card) return;
+            const charId = parseInt(card.dataset.id);
+            const character = selectedCharacters.find(c => c.id === charId);
+            if (!character) return;
+
+            if (target.classList.contains('hp-change-btn')) {
+                const input = card.querySelector('.hp-delta-input');
+                let delta = parseInt(input.value, 10);
+                if (isNaN(delta)) delta = 0;
+                if (delta !== 0) {
+                    changeHP(character, delta);
+                    input.value = 0;
+                }
+                return;
+            }
+            if (target.classList.contains('ability-btn')) {
+                const abilityIdx = parseInt(target.dataset.abilityIndex);
+                if (!isNaN(abilityIdx)) {
+                    useAbility(character, abilityIdx);
+                }
+                return;
+            }
+            if (target.classList.contains('move-btn')) {
+                const input = card.querySelector('.move-cost');
+                let cost = parseInt(input.value, 10);
+                if (isNaN(cost) || cost <= 0) {
+                    alert('Введите положительное число маны');
+                    return;
+                }
+                moveAction(character, cost);
+                input.value = 1;
+                return;
+            }
+        }
+
+        function useAbility(character, abilityIdx) {
+            const ability = character.abilities[abilityIdx];
+            if (currentMana >= ability.mana) {
+                currentMana -= ability.mana;
+                actionHistory.push({ type: 'ability', cost: ability.mana });
+                persistState();
+                updateUI();
+            } else {
+                alert(`Не хватает маны! Нужно ${ability.mana}, есть ${currentMana}`);
+            }
+        }
+
+        function changeHP(character, delta) {
+            if (delta === 0) return;
+            const newHp = charactersHP[character.id] + delta;
+            if (newHp < 0 && !confirm(`HP станет отрицательным (${newHp}). Продолжить?`)) return;
+            charactersHP[character.id] = newHp;
+            actionHistory.push({ type: 'hpChange', charId: character.id, delta: delta });
+            persistState();
+            const hpSpan = document.querySelector(`.character-card[data-id='${character.id}'] .hp-value`);
+            if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[character.id]}`;
+            updateUI();
+        }
+
+        function moveAction(character, cost) {
+            if (currentMana >= cost) {
+                currentMana -= cost;
+                actionHistory.push({ type: 'move', cost: cost });
+                persistState();
+                updateUI();
+            } else {
+                alert(`Не хватает маны! Нужно ${cost}, есть ${currentMana}`);
+            }
+        }
+
+        function undo() {
+            if (actionHistory.length === 0) {
+                alert('Нет действий для отмены');
+                return;
+            }
+            const last = actionHistory.pop();
+            switch (last.type) {
+                case 'ability':
+                case 'move':
+                    currentMana += last.cost;
+                    break;
+                case 'hpChange':
+                    charactersHP[last.charId] -= last.delta;
+                    const hpSpan = document.querySelector(`.character-card[data-id='${last.charId}'] .hp-value`);
+                    if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[last.charId]}`;
+                    break;
+            }
+            persistState();
+            updateUI();
+        }
+
+        function endTurn() {
+            currentMana += 5;
+            actionHistory = [];
+            persistState();
+            location.reload();
+        }
+
+        function changeTeam() {
+            localStorage.removeItem('selectedCharacters');
+            localStorage.removeItem('currentMana');
+            localStorage.removeItem('charactersHP');
+            localStorage.removeItem('actionHistory');
+            window.location.href = 'index.html';
+        }
+
+        function init() {
+            if (!loadGameState()) return; // если ошибка, показываем сообщение и не инициализируем игру
+            renderCharacters();
+            const grid = document.getElementById('characters-grid');
+            if (grid) grid.addEventListener('click', handleGridClick);
+            const undoBtn = document.getElementById('undo-btn');
+            if (undoBtn) undoBtn.addEventListener('click', undo);
+            const endTurnBtn = document.getElementById('end-turn-btn');
+            if (endTurnBtn) endTurnBtn.addEventListener('click', endTurn);
+            const changeTeamBtn = document.getElementById('change-team-btn');
+            if (changeTeamBtn) changeTeamBtn.addEventListener('click', changeTeam);
+        }
+
+        // Запуск после полной загрузки DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
+</body>
+</html>

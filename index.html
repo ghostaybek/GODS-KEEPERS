@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Выбор команды хранителей</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a2a3a;
+            color: #eee;
+            margin: 0;
+            padding: 16px;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd966;
+            font-size: 1.8rem;
+            margin: 0 0 20px 0;
+        }
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .character-card {
+            background: #2c3e4e;
+            border-radius: 20px;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+        .character-card.selected {
+            border-color: #ffd966;
+            background: #3e5a6b;
+            box-shadow: 0 0 12px rgba(255,217,102,0.4);
+        }
+        .character-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .character-hp {
+            font-size: 1rem;
+            color: #ffaa66;
+            margin-bottom: 8px;
+        }
+        .abilities {
+            font-size: 0.85rem;
+            text-align: left;
+            margin-top: 10px;
+            border-top: 1px solid #4a6a7a;
+            padding-top: 8px;
+        }
+        .ability-item {
+            margin: 4px 0;
+        }
+        button {
+            background: #ffaa44;
+            color: #1e2a36;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 24px auto 16px;
+            transition: background 0.2s;
+            width: 90%;
+            max-width: 300px;
+        }
+        button:disabled {
+            background: #6c7a89;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background: #ffcc66;
+        }
+        .message {
+            text-align: center;
+            color: #ffaa66;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            .characters-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            .character-name {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>⚔️ Выберите 5 хранителей ⚔️</h1>
+    <div id="characters-grid" class="characters-grid"></div>
+    <button id="ready-btn" disabled>Команда готова</button>
+    <div id="message" class="message"></div>
+
+    <script>
+        const characters = [
+            { id: 1, name: "Темпос", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 2, name: "Гоуст", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 3, name: "Иллюжн", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 4, name: "Форс", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 5, name: "Вита", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 6, name: "Аюно", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 7, name: "Вампир", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 8, name: "Серпенс", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 9, name: "Ион", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 10, name: "Айси", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 11, name: "Друид", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 12, name: "Магмус", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 13, name: "Нано", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 14, name: "Кёрс", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "Защитный щит", mana: 4 },
+                { name: "Яростный рывок", mana: 5 }
+            ] },
+            { id: 15, name: "Сайтер", hp: 15, abilities: [
+                { name: "Мощный удар", mana: 3 },
+                { name: "ВИНТОВКА", mana: 10 },
+                { name: "Яростный рывок", mana: 5 }
+            ] }
+        ];
+
+        let selectedIds = [];
+
+        function renderCharacters() {
+            const grid = document.getElementById('characters-grid');
+            grid.innerHTML = '';
+            characters.forEach(char => {
+                const card = document.createElement('div');
+                card.className = `character-card ${selectedIds.includes(char.id) ? 'selected' : ''}`;
+                card.dataset.id = char.id;
+                const abilitiesPreview = char.abilities.map(a => `${a.name} (${a.mana} м)`).join(', ');
+                card.innerHTML = `
+                    <div class="character-name">${char.name}</div>
+                    <div class="character-hp">❤️ ${char.hp} HP</div>
+                    <div class="abilities">${abilitiesPreview}</div>
+                `;
+                card.addEventListener('click', () => toggleSelection(char.id));
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleSelection(id) {
+            const index = selectedIds.indexOf(id);
+            if (index === -1) {
+                if (selectedIds.length >= 5) {
+                    document.getElementById('message').textContent = 'Можно выбрать только 5 хранителей!';
+                    return;
+                }
+                selectedIds.push(id);
+            } else {
+                selectedIds.splice(index, 1);
+            }
+            document.getElementById('message').textContent = '';
+            renderCharacters();
+            updateReadyButton();
+        }
+
+        function updateReadyButton() {
+            const btn = document.getElementById('ready-btn');
+            btn.disabled = selectedIds.length !== 5;
+        }
+
+        document.getElementById('ready-btn').addEventListener('click', () => {
+            if (selectedIds.length === 5) {
+                localStorage.setItem('selectedCharacters', JSON.stringify(selectedIds));
+                localStorage.removeItem('currentMana');
+                localStorage.removeItem('charactersHP');
+                localStorage.removeItem('actionHistory');
+                window.location.href = 'game.html';
+            }
+        });
+
+        renderCharacters();
+        updateReadyButton();
+    </script>
+</body>
+</html>
