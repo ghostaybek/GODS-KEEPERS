@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Битва хранителей</title>
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0f1a24;
@@ -16,10 +13,7 @@
             margin: 0;
             padding: 16px;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1400px; margin: 0 auto; }
         .header {
             background: #1e3a4a;
             border-radius: 24px;
@@ -29,7 +23,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .mana-display {
@@ -44,6 +38,30 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+        .move-global {
+            background: #2a3f4a;
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .move-global input {
+            width: 100px;
+            padding: 8px;
+            border-radius: 30px;
+            border: none;
+            text-align: center;
+            font-size: 1rem;
+            background: #f0f0f0;
+        }
+        .move-global button {
+            background: #6a4e3a;
+            margin: 0;
+            padding: 6px 14px;
+            font-size: 0.9rem;
         }
         button {
             background: #3a6b5b;
@@ -56,12 +74,8 @@
             font-weight: bold;
             transition: background 0.2s;
         }
-        button:hover {
-            background: #4f8a76;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
+        button:hover { background: #4f8a76; }
+        button:active { transform: scale(0.98); }
         button:disabled {
             background: #2c4a3e;
             opacity: 0.6;
@@ -71,11 +85,17 @@
         .back-btn:hover { background: #d46b1e; }
         .end-turn-btn { background: #2c6e9e; }
         .end-turn-btn:hover { background: #3580b8; }
-        .change-team-btn { background: #a12f2f; }
-        .change-team-btn:hover { background: #c23b3b; }
+        .kill-btn { background: #a12f2f; }
+        .kill-btn:hover { background: #c23b3b; }
+        .undo-turn-btn { background: #ffaa44; color: #1e2a36; }
+        .undo-turn-btn:hover { background: #ffcc66; }
+        .random-btn { background: #8e44ad; }
+        .random-btn:hover { background: #9b59b6; }
+        .change-team-btn { background: #6a4e3a; }
+        .change-team-btn:hover { background: #7e5d46; }
         .characters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
         }
         .character-card {
@@ -89,8 +109,15 @@
             font-weight: bold;
             text-align: center;
             margin-bottom: 12px;
-            color: #ffcc88;
         }
+        /* Цвета имён */
+        .name-cyan { color: #00ffff; }
+        .name-pink { color: #ff69b4; }
+        .name-green { color: #00ff7f; }
+        .name-red { color: #ff4444; }
+        .name-purple { color: #aa66ff; }
+        .name-gold { color: #ffd700; }
+
         .hp-section {
             background: #2a3f4a;
             border-radius: 20px;
@@ -124,56 +151,45 @@
         .abilities {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+        .ability-wrapper {
+            background: #2a3f4a;
+            border-radius: 16px;
+            overflow: hidden;
         }
         .ability-btn {
             background: #3f5e6b;
             width: 100%;
             text-align: left;
-            padding: 12px 15px;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            border-radius: 0;
         }
-        .ability-name {
-            font-weight: bold;
-        }
+        .ability-name { font-weight: bold; }
         .ability-cost {
             background: #00000055;
             padding: 2px 10px;
             border-radius: 20px;
         }
-        .move-section {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #4a6a7a;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .move-section input {
-            width: 100px;
-            padding: 10px;
-            border-radius: 30px;
-            border: none;
-            text-align: center;
-            background: #f0f0f0;
-            font-size: 1rem;
-        }
-        .move-btn {
-            background: #6a4e3a;
-            flex: 1;
-            padding: 10px;
+        .ability-desc {
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            background: #1e2f3a;
+            color: #ccc;
+            line-height: 1.3;
         }
         @media (max-width: 600px) {
             body { padding: 12px; }
             .characters-grid { grid-template-columns: 1fr; gap: 16px; }
             .character-name { font-size: 1.4rem; }
             .hp-value { font-size: 1.3rem; }
-            .ability-btn { padding: 10px 12px; font-size: 0.9rem; }
-            .move-section input { width: 85px; }
+            .ability-btn { padding: 8px 12px; font-size: 0.85rem; }
+            .ability-desc { font-size: 0.65rem; }
+            .move-global input { width: 85px; }
             button { padding: 8px 14px; font-size: 0.85rem; }
             .mana-display { font-size: 1.2rem; }
         }
@@ -192,8 +208,15 @@
     <div class="header">
         <div class="mana-display">🌀 Мана: <span id="mana-value">0</span></div>
         <div class="actions">
+            <div class="move-global">
+                <input type="number" id="move-cost" placeholder="трата маны" value="1" step="1">
+                <button id="move-global-btn">🚶 Движ</button>
+            </div>
+            <button id="random-btn" class="random-btn">🎲 Рандом</button>
             <button id="undo-btn" class="back-btn">↩️ Назад</button>
+            <button id="undo-turn-btn" class="undo-turn-btn">⏪ Вернуть ход</button>
             <button id="end-turn-btn" class="end-turn-btn">✨ Завершить ход</button>
+            <button id="kill-btn" class="kill-btn">💀 Убил врага</button>
             <button id="change-team-btn" class="change-team-btn">🔄 Сменить команду</button>
         </div>
     </div>
@@ -202,103 +225,134 @@
 
 <script>
     (function() {
-        // Данные всех персонажей
+        // ----- ДАННЫЕ ПЕРСОНАЖЕЙ (с описаниями) -----
         const fullCharacters = [
             { id: 1, name: "Темпос", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Самурай", mana: 4, description: "рывок на 3 кл., наносящий всем на своём пути 3 ур." },
+                { name: "Рывок", mana: 3, description: "перемещается в сум. 4 кл." },
+                { name: "У - Флэшбэк", mana: 0, description: "отматывает один ход назад." }
             ] },
             { id: 2, name: "Гоуст", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Пистолет-призрак", mana: 4, description: "наносит 2 ур. в сум. 4 кл. (может стрелять сквозь стены)." },
+                { name: "Телепорт", mana: 4, description: "в рад. 5 кл." },
+                { name: "У - Портал", mana: 4, description: "создаёт 2 портала в 2 любых точках карты (может убрать их в любой момент)." }
             ] },
             { id: 3, name: "Иллюжн", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Клинок", mana: 4, description: "наносит 5 ур. в рад. 1 кл." },
+                { name: "Иллюзия", mana: 4, description: "оппонент в сум. 6 кл. наносит сам себе 3 ур." },
+                { name: "У - Другой мир", mana: 9, description: "управляет оппонентом в течение 1 хода (Иллюжн тратит свою ману)." }
             ] },
             { id: 4, name: "Форс", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Натиск саев", mana: 6, description: "наносит 4 ур. в сум. 6 кл." },
+                { name: "Притяжение оппонента", mana: 6, description: "притягивает выбранного оппонента на 2 кл." },
+                { name: "У - Телекинез", mana: 3, description: "перемещает всех Хранителей на 2 кл." }
             ] },
             { id: 5, name: "Вита", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Зеркало миротворца", mana: 6, description: "отражает суммарный урон от оппонента, нанося ему на 1 ур. меньше." },
+                { name: "Жизни", mana: 8, description: "восстанавливает 3 хп себе или союзнику." },
+                { name: "У - Лечение Хранителя", mana: 5, description: "воскрешает союзника, после воскрешения у него 5 хп." }
             ] },
             { id: 6, name: "Аюно", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Посох смерти", mana: 2, description: "наносит 2 ур. в сум. 6 кл." },
+                { name: "В - Призыв скелета", mana: 9, description: "у него 5 хп и ур. 3 в рад. 1 кл. или 2 ур. в сум. 4 кл." },
+                { name: "П - Воскрешение", mana: 0, description: "после смерти воскрешается в рад. 10 кл. от места смерти с 1 хп." }
             ] },
             { id: 7, name: "Вампир", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Умбра", mana: 6, description: "двуручный клинок, наносящий 5 ур. в рад. 2 кл., прибавляющий 2 хп Вампиру после попадания." },
+                { name: "Жизненное высасывание", mana: 8, description: "вампирская магия, высасывающая 3 хп из Хранителя в сум. 6 кл." },
+                { name: "У- Бессмертие", mana: 0, description: "когда у Вампира остаётся 6 хп или меньше, высасывает 3 хп из ближайшего оппонента." }
             ] },
             { id: 8, name: "Серпенс", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Ядовитый выстрел", mana: 5, description: "наносит 5 ур. с вер. 6 в сум. 6 кл., при попадании следующим ходом наносит ещё 2 ур." },
+                { name: "В - Призыв змеи", mana: 9, description: "она наносит 4 ур. ядом в рад. 3 кл., который следующий ход наносит ещё 2 ур." },
+                { name: "П - Плотная чешуя", mana: 0, description: "у Серпенса 18 хп с начала игры." }
             ] },
             { id: 9, name: "Ион", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Молнии из рук", mana: 4, description: "наносит 3 ур. всем оппонентам в рад. 3 кл." },
+                { name: "Разряд молнии", mana: 4, description: "наносит 2 ур. в рад. 4 кл. и не даёт оппоненту нанести ур. в след. ходу." },
+                { name: "П - Энергия", mana: 0, description: "бесплатно может передвигаться на 1 кл. каждый ход." }
             ] },
             { id: 10, name: "Айси", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Ледяные шипы", mana: 4, description: "стреляет ледяными шипами по всем диагоналям в рад. 3 кл., нанося 4 ур." },
+                { name: "Скольжение", mana: 2, description: "скользит на 2 кл. по диагонали." },
+                { name: "У - Заморозка", mana: 8, description: "все оппоненты в рад. 7 кл. пропускают ход, с каждым замёрзшим оппонентом снижено получение маны соперника за ход." }
             ] },
             { id: 11, name: "Друид", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Деревянный лук", mana: 5, description: "наносит 3 ур. в сум. 10 кл. (может стрелять через стены)." },
+                { name: "В - Древесный захват", mana: 10, description: "оппонента в сум. 5 кл. захватывают деревья, чтобы спасти его, союзник должен подбежать к пойманному и потратить 7 маны, иначе деревья забирают жизнь пойманного." },
+                { name: "У - Лечебные растения", mana: 10, description: "восстанавливает 2 хп каждому союзнику." }
             ] },
             { id: 12, name: "Магмус", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Оружия лавы", mana: 6, description: "наносит оппоненту в рад. 1 кл. 7 ур." },
+                { name: "Р - Огненный шар", mana: 3, description: "наносит 5 ур. с вер. 5 в сум. 5 кл." },
+                { name: "У - Землетрясение", mana: 0, description: "меняет 2 любые кл. местами." }
             ] },
             { id: 13, name: "Нано", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Подрывные пули", mana: 6, description: "делает 2 выстрела (каждый наносит 3 ур. с вер. 6) оппоненту в сум. 7 кл." },
+                { name: "В - Динамит", mana: 4, description: "устанавливает бомбу, наносящую 5 ур., если враг наступит на неё." },
+                { name: "У - Нано-жук", mana: 4, description: "уклоняется от любой атаки оппонента." }
             ] },
             { id: 14, name: "Кёрс", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Миниган", mana: 6, description: "делает 3 выстрела (каждый наносит 2 ур. с вер. 7) оппоненту в сум. 6 кл." },
+                { name: "В - Ракетница", mana: 12, description: "летит в любую точку карты и наносит 8 ур., 7 ур. в рад. 1 кл. от точки, 6 ур. в рад. 2 кл." },
+                { name: "П - Скорость", mana: 0, description: "бесплатно может передвигаться на 2 кл. каждый ход." }
             ] },
             { id: 15, name: "Сайтер", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "ВИНТОВКА", mana: 10 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Револьвер", mana: 6, description: "делает 2 выстрела (каждый наносят 3 ур. с вер. 7) оппоненту в сум. 5 кл." },
+                { name: "В - Винтовка", mana: 10, description: "наносит 10 ур. в сум. от 5 кл. и больше." },
+                { name: "У - Дымовуха", mana: 0, description: "скрывает Сайтера, и он перемещается в любую точку в рад. 7 кл." }
             ] }
         ];
+
+        // Функция для получения класса цвета по имени
+        function getNameColorClass(name) {
+            const colorMap = {
+                "Темпос": "name-cyan",
+                "Гоуст": "name-pink",
+                "Иллюжн": "name-pink",
+                "Форс": "name-pink",
+                "Вита": "name-green",
+                "Аюно": "name-red",
+                "Вампир": "name-red",
+                "Серпенс": "name-red",
+                "Ион": "name-purple",
+                "Айси": "name-purple",
+                "Друид": "name-purple",
+                "Магмус": "name-purple",
+                "Нано": "name-gold",
+                "Кёрс": "name-gold",
+                "Сайтер": "name-gold"
+            };
+            return colorMap[name] || "";
+        }
 
         let selectedCharacters = [];
         let currentMana = 15;
         let charactersHP = {};
         let actionHistory = [];
+        let usedUniqueAbilities = {};
+        let blockedVenomAbilities = {};
+        let savedStateBeforeTurn = null;
 
-        // Функция для отображения ошибки и кнопки возврата
-        function showError(message) {
-            const grid = document.getElementById('characters-grid');
-            grid.innerHTML = `<div class="error-message">
-                <strong>❌ Ошибка:</strong> ${message}<br><br>
-                <button id="force-back" style="background:#ffaa44; color:#1e2a36;">Вернуться к выбору команды</button>
-            </div>`;
-            document.getElementById('force-back').addEventListener('click', () => {
-                window.location.href = 'index.html';
-            });
+        function getAbilityType(abilityName) {
+            if (abilityName.startsWith("У -") || abilityName.startsWith("У-")) return "unique";
+            if (abilityName.startsWith("В -") || abilityName.startsWith("В-")) return "venom";
+            return "normal";
         }
 
-        // Загрузка состояния
+        function persistState() {
+            localStorage.setItem('currentMana', currentMana);
+            localStorage.setItem('charactersHP', JSON.stringify(charactersHP));
+            localStorage.setItem('actionHistory', JSON.stringify(actionHistory));
+            localStorage.setItem('usedUniqueAbilities', JSON.stringify(usedUniqueAbilities));
+            localStorage.setItem('blockedVenomAbilities', JSON.stringify(blockedVenomAbilities));
+            if (savedStateBeforeTurn) {
+                localStorage.setItem('savedStateBeforeTurn', JSON.stringify(savedStateBeforeTurn));
+            } else {
+                localStorage.removeItem('savedStateBeforeTurn');
+            }
+        }
+
         function loadGameState() {
             const savedIds = localStorage.getItem('selectedCharacters');
             if (!savedIds) {
@@ -329,9 +383,7 @@
             if (savedHP) {
                 try {
                     charactersHP = JSON.parse(savedHP);
-                } catch(e) {
-                    charactersHP = {};
-                }
+                } catch(e) {}
             }
             if (Object.keys(charactersHP).length === 0) {
                 selectedCharacters.forEach(ch => { charactersHP[ch.id] = ch.hp; });
@@ -341,39 +393,84 @@
             if (savedHistory) {
                 try {
                     actionHistory = JSON.parse(savedHistory);
-                } catch(e) {
-                    actionHistory = [];
-                }
+                } catch(e) { actionHistory = []; }
             }
+
+            const savedUnique = localStorage.getItem('usedUniqueAbilities');
+            if (savedUnique) {
+                try {
+                    usedUniqueAbilities = JSON.parse(savedUnique);
+                } catch(e) { usedUniqueAbilities = {}; }
+            } else {
+                usedUniqueAbilities = {};
+            }
+
+            const savedVenom = localStorage.getItem('blockedVenomAbilities');
+            if (savedVenom) {
+                try {
+                    blockedVenomAbilities = JSON.parse(savedVenom);
+                } catch(e) { blockedVenomAbilities = {}; }
+            } else {
+                blockedVenomAbilities = {};
+            }
+
+            const savedTurn = localStorage.getItem('savedStateBeforeTurn');
+            if (savedTurn) {
+                try {
+                    savedStateBeforeTurn = JSON.parse(savedTurn);
+                } catch(e) { savedStateBeforeTurn = null; }
+            }
+
             return true;
         }
 
-        function persistState() {
-            localStorage.setItem('currentMana', currentMana);
-            localStorage.setItem('charactersHP', JSON.stringify(charactersHP));
-            localStorage.setItem('actionHistory', JSON.stringify(actionHistory));
+        function showError(message) {
+            const grid = document.getElementById('characters-grid');
+            if (grid) {
+                grid.innerHTML = `<div class="error-message">
+                    <strong>❌ Ошибка:</strong> ${message}<br><br>
+                    <button id="force-back" style="background:#ffaa44; color:#1e2a36;">Вернуться к выбору команды</button>
+                </div>`;
+                document.getElementById('force-back')?.addEventListener('click', () => {
+                    window.location.href = 'index.html';
+                });
+            }
+        }
+
+        function clampMana(value) {
+            return Math.min(15, Math.max(0, value));
         }
 
         function updateUI() {
             const manaSpan = document.getElementById('mana-value');
             if (manaSpan) manaSpan.textContent = currentMana;
 
+            const moveCostInput = document.getElementById('move-cost');
+            const moveBtn = document.getElementById('move-global-btn');
+            if (moveCostInput && moveBtn) {
+                const val = parseInt(moveCostInput.value, 10);
+                moveBtn.disabled = isNaN(val) || val <= 0 || currentMana < val;
+            }
+
             document.querySelectorAll('.character-card').forEach(card => {
                 const charId = parseInt(card.dataset.id);
                 const char = selectedCharacters.find(c => c.id === charId);
                 if (!char) return;
 
-                card.querySelectorAll('.ability-btn').forEach((btn, idx) => {
-                    const cost = char.abilities[idx].mana;
-                    btn.disabled = currentMana < cost;
+                const abilityBtns = card.querySelectorAll('.ability-btn');
+                abilityBtns.forEach((btn, idx) => {
+                    const ability = char.abilities[idx];
+                    const type = getAbilityType(ability.name);
+                    const key = `${charId}_${idx}`;
+                    let disabled = false;
+                    if (type === 'unique') {
+                        disabled = usedUniqueAbilities[key] === true;
+                    } else if (type === 'venom') {
+                        disabled = blockedVenomAbilities[key] === true;
+                    }
+                    if (currentMana < ability.mana) disabled = true;
+                    btn.disabled = disabled;
                 });
-
-                const moveBtn = card.querySelector('.move-btn');
-                const moveInput = card.querySelector('.move-cost');
-                if (moveBtn && moveInput) {
-                    const val = parseInt(moveInput.value, 10);
-                    moveBtn.disabled = isNaN(val) || val <= 0 || currentMana < val;
-                }
             });
         }
 
@@ -383,11 +480,25 @@
             grid.innerHTML = '';
             selectedCharacters.forEach(char => {
                 const currentHp = charactersHP[char.id] !== undefined ? charactersHP[char.id] : char.hp;
+                const colorClass = getNameColorClass(char.name);
                 const card = document.createElement('div');
                 card.className = 'character-card';
                 card.dataset.id = char.id;
+                let abilitiesHtml = '<div class="abilities">';
+                char.abilities.forEach((ab, idx) => {
+                    abilitiesHtml += `
+                        <div class="ability-wrapper">
+                            <button class="ability-btn" data-ability-index="${idx}">
+                                <span class="ability-name">${ab.name}</span>
+                                <span class="ability-cost">${ab.mana} маны</span>
+                            </button>
+                            <div class="ability-desc">${ab.description}</div>
+                        </div>
+                    `;
+                });
+                abilitiesHtml += '</div>';
                 card.innerHTML = `
-                    <div class="character-name">${char.name}</div>
+                    <div class="character-name ${colorClass}">${char.name}</div>
                     <div class="hp-section">
                         <span class="hp-value">❤️ ${currentHp}</span>
                         <div class="hp-control">
@@ -395,22 +506,156 @@
                             <button class="hp-change-btn">Изменить здоровье</button>
                         </div>
                     </div>
-                    <div class="abilities">
-                        ${char.abilities.map((ab, idx) => `
-                            <button class="ability-btn" data-ability-index="${idx}">
-                                <span class="ability-name">${ab.name}</span>
-                                <span class="ability-cost">${ab.mana} маны</span>
-                            </button>
-                        `).join('')}
-                    </div>
-                    <div class="move-section">
-                        <input type="number" class="move-cost" placeholder="трата маны" value="1" step="1">
-                        <button class="move-btn">🚶 Движ</button>
-                    </div>
+                    ${abilitiesHtml}
                 `;
                 grid.appendChild(card);
             });
             updateUI();
+        }
+
+        function saveStateForUndoTurn() {
+            savedStateBeforeTurn = {
+                currentMana: currentMana,
+                charactersHP: { ...charactersHP },
+                usedUniqueAbilities: { ...usedUniqueAbilities },
+                blockedVenomAbilities: { ...blockedVenomAbilities }
+            };
+            persistState();
+        }
+
+        function undoLastTurn() {
+            if (!savedStateBeforeTurn) {
+                alert('Нет сохранённого хода для отката');
+                return;
+            }
+            currentMana = savedStateBeforeTurn.currentMana;
+            charactersHP = { ...savedStateBeforeTurn.charactersHP };
+            usedUniqueAbilities = { ...savedStateBeforeTurn.usedUniqueAbilities };
+            blockedVenomAbilities = { ...savedStateBeforeTurn.blockedVenomAbilities };
+            actionHistory = [];
+            persistState();
+            renderCharacters();
+            updateUI();
+            alert('Ход откачён! Состояние восстановлено.');
+        }
+
+        function useAbility(character, abilityIdx) {
+            const ability = character.abilities[abilityIdx];
+            const type = getAbilityType(ability.name);
+            const key = `${character.id}_${abilityIdx}`;
+
+            if (type === 'unique' && usedUniqueAbilities[key]) {
+                alert('Эта способность уже использована один раз за игру!');
+                return;
+            }
+            if (type === 'venom' && blockedVenomAbilities[key]) {
+                alert('Эта способность временно недоступна. Убейте врага, чтобы восстановить её.');
+                return;
+            }
+            if (currentMana < ability.mana) {
+                alert(`Не хватает маны! Нужно ${ability.mana}, есть ${currentMana}`);
+                return;
+            }
+
+            currentMana = clampMana(currentMana - ability.mana);
+            actionHistory.push({
+                type: 'ability',
+                abilityKey: key,
+                abilityType: type,
+                cost: ability.mana
+            });
+
+            if (type === 'unique') {
+                usedUniqueAbilities[key] = true;
+            } else if (type === 'venom') {
+                blockedVenomAbilities[key] = true;
+            }
+
+            persistState();
+            updateUI();
+        }
+
+        function killEnemy() {
+            blockedVenomAbilities = {};
+            persistState();
+            updateUI();
+            alert('Враг повержен! Способности с префиксом "В" снова доступны.');
+        }
+
+        function changeHP(character, delta) {
+            if (delta === 0) return;
+            const newHp = charactersHP[character.id] + delta;
+            if (newHp < 0 && !confirm(`HP станет отрицательным (${newHp}). Продолжить?`)) return;
+            charactersHP[character.id] = newHp;
+            actionHistory.push({ type: 'hpChange', charId: character.id, delta: delta });
+            persistState();
+            const hpSpan = document.querySelector(`.character-card[data-id='${character.id}'] .hp-value`);
+            if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[character.id]}`;
+            updateUI();
+        }
+
+        function globalMove() {
+            const costInput = document.getElementById('move-cost');
+            let cost = parseInt(costInput.value, 10);
+            if (isNaN(cost) || cost <= 0) {
+                alert('Введите положительное число маны');
+                return;
+            }
+            if (currentMana >= cost) {
+                currentMana = clampMana(currentMana - cost);
+                actionHistory.push({ type: 'move', cost: cost });
+                persistState();
+                updateUI();
+                costInput.value = 1;
+            } else {
+                alert(`Не хватает маны! Нужно ${cost}, есть ${currentMana}`);
+            }
+        }
+
+        function undo() {
+            if (actionHistory.length === 0) {
+                alert('Нет действий для отмены');
+                return;
+            }
+            const last = actionHistory.pop();
+            switch (last.type) {
+                case 'ability':
+                    currentMana = clampMana(currentMana + last.cost);
+                    if (last.abilityType === 'unique') {
+                        delete usedUniqueAbilities[last.abilityKey];
+                    } else if (last.abilityType === 'venom') {
+                        delete blockedVenomAbilities[last.abilityKey];
+                    }
+                    break;
+                case 'move':
+                    currentMana = clampMana(currentMana + last.cost);
+                    break;
+                case 'hpChange':
+                    charactersHP[last.charId] -= last.delta;
+                    const hpSpan = document.querySelector(`.character-card[data-id='${last.charId}'] .hp-value`);
+                    if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[last.charId]}`;
+                    break;
+            }
+            persistState();
+            updateUI();
+        }
+
+        function endTurn() {
+            saveStateForUndoTurn();
+            currentMana = clampMana(currentMana + 5);
+            actionHistory = [];
+            persistState();
+            location.reload();
+        }
+
+        function changeTeam() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        function randomize() {
+            const number = Math.floor(Math.random() * 10) + 1;
+            alert(`🎲 Случайное число: ${number}`);
         }
 
         function handleGridClick(e) {
@@ -438,104 +683,24 @@
                 }
                 return;
             }
-            if (target.classList.contains('move-btn')) {
-                const input = card.querySelector('.move-cost');
-                let cost = parseInt(input.value, 10);
-                if (isNaN(cost) || cost <= 0) {
-                    alert('Введите положительное число маны');
-                    return;
-                }
-                moveAction(character, cost);
-                input.value = 1;
-                return;
-            }
-        }
-
-        function useAbility(character, abilityIdx) {
-            const ability = character.abilities[abilityIdx];
-            if (currentMana >= ability.mana) {
-                currentMana -= ability.mana;
-                actionHistory.push({ type: 'ability', cost: ability.mana });
-                persistState();
-                updateUI();
-            } else {
-                alert(`Не хватает маны! Нужно ${ability.mana}, есть ${currentMana}`);
-            }
-        }
-
-        function changeHP(character, delta) {
-            if (delta === 0) return;
-            const newHp = charactersHP[character.id] + delta;
-            if (newHp < 0 && !confirm(`HP станет отрицательным (${newHp}). Продолжить?`)) return;
-            charactersHP[character.id] = newHp;
-            actionHistory.push({ type: 'hpChange', charId: character.id, delta: delta });
-            persistState();
-            const hpSpan = document.querySelector(`.character-card[data-id='${character.id}'] .hp-value`);
-            if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[character.id]}`;
-            updateUI();
-        }
-
-        function moveAction(character, cost) {
-            if (currentMana >= cost) {
-                currentMana -= cost;
-                actionHistory.push({ type: 'move', cost: cost });
-                persistState();
-                updateUI();
-            } else {
-                alert(`Не хватает маны! Нужно ${cost}, есть ${currentMana}`);
-            }
-        }
-
-        function undo() {
-            if (actionHistory.length === 0) {
-                alert('Нет действий для отмены');
-                return;
-            }
-            const last = actionHistory.pop();
-            switch (last.type) {
-                case 'ability':
-                case 'move':
-                    currentMana += last.cost;
-                    break;
-                case 'hpChange':
-                    charactersHP[last.charId] -= last.delta;
-                    const hpSpan = document.querySelector(`.character-card[data-id='${last.charId}'] .hp-value`);
-                    if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[last.charId]}`;
-                    break;
-            }
-            persistState();
-            updateUI();
-        }
-
-        function endTurn() {
-            currentMana += 5;
-            actionHistory = [];
-            persistState();
-            location.reload();
-        }
-
-        function changeTeam() {
-            localStorage.removeItem('selectedCharacters');
-            localStorage.removeItem('currentMana');
-            localStorage.removeItem('charactersHP');
-            localStorage.removeItem('actionHistory');
-            window.location.href = 'index.html';
         }
 
         function init() {
-            if (!loadGameState()) return; // если ошибка, показываем сообщение и не инициализируем игру
+            if (!loadGameState()) return;
             renderCharacters();
+
             const grid = document.getElementById('characters-grid');
             if (grid) grid.addEventListener('click', handleGridClick);
-            const undoBtn = document.getElementById('undo-btn');
-            if (undoBtn) undoBtn.addEventListener('click', undo);
-            const endTurnBtn = document.getElementById('end-turn-btn');
-            if (endTurnBtn) endTurnBtn.addEventListener('click', endTurn);
-            const changeTeamBtn = document.getElementById('change-team-btn');
-            if (changeTeamBtn) changeTeamBtn.addEventListener('click', changeTeam);
+
+            document.getElementById('random-btn')?.addEventListener('click', randomize);
+            document.getElementById('undo-btn')?.addEventListener('click', undo);
+            document.getElementById('undo-turn-btn')?.addEventListener('click', undoLastTurn);
+            document.getElementById('end-turn-btn')?.addEventListener('click', endTurn);
+            document.getElementById('kill-btn')?.addEventListener('click', killEnemy);
+            document.getElementById('move-global-btn')?.addEventListener('click', globalMove);
+            document.getElementById('change-team-btn')?.addEventListener('click', changeTeam);
         }
 
-        // Запуск после полной загрузки DOM
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
