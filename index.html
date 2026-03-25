@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Выбор команды хранителей</title>
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #1a2a3a;
@@ -24,7 +21,7 @@
         }
         .characters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 16px;
             max-width: 1300px;
             margin: 0 auto;
@@ -36,7 +33,6 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             border: 2px solid transparent;
-            text-align: center;
         }
         .character-card.selected {
             border-color: #ffd966;
@@ -46,22 +42,48 @@
         .character-name {
             font-size: 1.5rem;
             font-weight: bold;
-            margin-bottom: 8px;
+            text-align: center;
+            margin-bottom: 12px;
         }
-        .character-hp {
-            font-size: 1rem;
-            color: #ffaa66;
-            margin-bottom: 8px;
-        }
+        /* Цвета имён */
+        .name-cyan { color: #00ffff; }
+        .name-pink { color: #ff69b4; }
+        .name-green { color: #00ff7f; }
+        .name-red { color: #ff4444; }
+        .name-purple { color: #aa66ff; }
+        .name-gold { color: #ffd700; }
+
         .abilities {
-            font-size: 0.85rem;
-            text-align: left;
-            margin-top: 10px;
-            border-top: 1px solid #4a6a7a;
-            padding-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
         }
         .ability-item {
-            margin: 4px 0;
+            background: #1f3a46;
+            border-radius: 16px;
+            padding: 10px;
+        }
+        .ability-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        .ability-name {
+            color: #ffcc88;
+        }
+        .ability-cost {
+            background: #00000055;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .ability-desc {
+            font-size: 0.75rem;
+            line-height: 1.3;
+            color: #ddd;
+            margin-top: 5px;
         }
         button {
             background: #ffaa44;
@@ -91,25 +113,16 @@
             margin-top: 10px;
         }
         @media (max-width: 600px) {
-            body {
-                padding: 12px;
-            }
-            .characters-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            button {
-                padding: 12px 20px;
-                font-size: 1rem;
-            }
-            .character-name {
-                font-size: 1.3rem;
-            }
+            body { padding: 12px; }
+            .characters-grid { grid-template-columns: 1fr; gap: 12px; }
+            button { padding: 12px 20px; font-size: 1rem; }
+            .character-name { font-size: 1.3rem; }
+            .ability-desc { font-size: 0.7rem; }
         }
     </style>
 </head>
 <body>
-    <h1>⚔️ Выберите 5 хранителей ⚔️</h1>
+    <h1>⚔️ Выберите 5 Хранителей ⚔️</h1>
     <div id="characters-grid" class="characters-grid"></div>
     <button id="ready-btn" disabled>Команда готова</button>
     <div id="message" class="message"></div>
@@ -117,81 +130,103 @@
     <script>
         const characters = [
             { id: 1, name: "Темпос", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Самурай", mana: 4, description: "рывок на 3 кл., наносящий всем на своём пути 3 ур." },
+                { name: "Рывок", mana: 3, description: "перемещается в сум. 4 кл." },
+                { name: "У - Флэшбэк", mana: 0, description: "отматывает один ход назад." }
             ] },
             { id: 2, name: "Гоуст", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Пистолет-призрак", mana: 4, description: "наносит 2 ур. в сум. 4 кл. (может стрелять сквозь стены)." },
+                { name: "Телепорт", mana: 4, description: "в рад. 5 кл." },
+                { name: "У - Портал", mana: 4, description: "создаёт 2 портала в 2 любых точках карты (может убрать их в любой момент)." }
             ] },
             { id: 3, name: "Иллюжн", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Клинок", mana: 4, description: "наносит 5 ур. в рад. 1 кл." },
+                { name: "Иллюзия", mana: 4, description: "оппонент в сум. 6 кл. наносит сам себе 3 ур." },
+                { name: "У - Другой мир", mana: 9, description: "управляет оппонентом в течение 1 хода (Иллюжн тратит свою ману)." }
             ] },
             { id: 4, name: "Форс", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Натиск саев", mana: 6, description: "наносит 4 ур. в сум. 6 кл." },
+                { name: "Притяжение оппонента", mana: 6, description: "притягивает выбранного оппонента на 2 кл." },
+                { name: "У - Телекинез", mana: 3, description: "перемещает всех Хранителей на 2 кл." }
             ] },
             { id: 5, name: "Вита", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Зеркало миротворца", mana: 6, description: "отражает суммарный урон от оппонента, нанося ему на 1 ур. меньше." },
+                { name: "Жизни", mana: 8, description: "восстанавливает 3 хп себе или союзнику." },
+                { name: "У - Лечение Хранителя", mana: 5, description: "воскрешает союзника, после воскрешения у него 5 хп." }
             ] },
             { id: 6, name: "Аюно", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Посох смерти", mana: 2, description: "наносит 2 ур. в сум. 6 кл." },
+                { name: "В - Призыв скелета", mana: 9, description: "у него 5 хп и ур. 3 в рад. 1 кл. или 2 ур. в сум. 4 кл." },
+                { name: "П - Воскрешение", mana: 0, description: "после смерти воскрешается в рад. 10 кл. от места смерти с 1 хп." }
             ] },
             { id: 7, name: "Вампир", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Умбра", mana: 6, description: "двуручный клинок, наносящий 5 ур. в рад. 2 кл., прибавляющий 2 хп Вампиру после попадания." },
+                { name: "Жизненное высасывание", mana: 8, description: "вампирская магия, высасывающая 3 хп из Хранителя в сум. 6 кл." },
+                { name: "У- Бессмертие", mana: 0, description: "когда у Вампира остаётся 6 хп или меньше, высасывает 3 хп из ближайшего оппонента." }
             ] },
             { id: 8, name: "Серпенс", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Ядовитый выстрел", mana: 5, description: "наносит 5 ур. с вер. 6 в сум. 6 кл., при попадании следующим ходом наносит ещё 2 ур." },
+                { name: "В - Призыв змеи", mana: 9, description: "она наносит 4 ур. ядом в рад. 3 кл., который следующий ход наносит ещё 2 ур." },
+                { name: "П - Плотная чешуя", mana: 0, description: "у Серпенса 18 хп с начала игры." }
             ] },
             { id: 9, name: "Ион", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Молнии из рук", mana: 4, description: "наносит 3 ур. всем оппонентам в рад. 3 кл." },
+                { name: "Разряд молнии", mana: 4, description: "наносит 2 ур. в рад. 4 кл. и не даёт оппоненту нанести ур. в след. ходу." },
+                { name: "П - Энергия", mana: 0, description: "бесплатно может передвигаться на 1 кл. каждый ход." }
             ] },
             { id: 10, name: "Айси", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Ледяные шипы", mana: 4, description: "стреляет ледяными шипами по всем диагоналям в рад. 3 кл., нанося 4 ур." },
+                { name: "Скольжение", mana: 2, description: "скользит на 2 кл. по диагонали." },
+                { name: "У - Заморозка", mana: 8, description: "все оппоненты в рад. 7 кл. пропускают ход, с каждым замёрзшим оппонентом снижено получение маны соперника за ход." }
             ] },
             { id: 11, name: "Друид", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Деревянный лук", mana: 5, description: "наносит 3 ур. в сум. 10 кл. (может стрелять через стены)." },
+                { name: "В - Древесный захват", mana: 10, description: "оппонента в сум. 5 кл. захватывают деревья, чтобы спасти его, союзник должен подбежать к пойманному и потратить 7 маны, иначе деревья забирают жизнь пойманного." },
+                { name: "У - Лечебные растения", mana: 10, description: "восстанавливает 2 хп каждому союзнику." }
             ] },
             { id: 12, name: "Магмус", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Оружия лавы", mana: 6, description: "наносит оппоненту в рад. 1 кл. 7 ур." },
+                { name: "Р - Огненный шар", mana: 3, description: "наносит 5 ур. с вер. 5 в сум. 5 кл." },
+                { name: "У - Землетрясение", mana: 0, description: "меняет 2 любые кл. местами." }
             ] },
             { id: 13, name: "Нано", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Подрывные пули", mana: 6, description: "делает 2 выстрела (каждый наносит 3 ур. с вер. 6) оппоненту в сум. 7 кл." },
+                { name: "В - Динамит", mana: 4, description: "устанавливает бомбу, наносящую 5 ур., если враг наступит на неё." },
+                { name: "У - Нано-жук", mana: 4, description: "уклоняется от любой атаки оппонента." }
             ] },
             { id: 14, name: "Кёрс", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "Защитный щит", mana: 4 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Миниган", mana: 6, description: "делает 3 выстрела (каждый наносит 2 ур. с вер. 7) оппоненту в сум. 6 кл." },
+                { name: "В - Ракетница", mana: 12, description: "летит в любую точку карты и наносит 8 ур., 7 ур. в рад. 1 кл. от точки, 6 ур. в рад. 2 кл." },
+                { name: "П - Скорость", mana: 0, description: "бесплатно может передвигаться на 2 кл. каждый ход." }
             ] },
             { id: 15, name: "Сайтер", hp: 15, abilities: [
-                { name: "Мощный удар", mana: 3 },
-                { name: "ВИНТОВКА", mana: 10 },
-                { name: "Яростный рывок", mana: 5 }
+                { name: "Р - Револьвер", mana: 6, description: "делает 2 выстрела (каждый наносят 3 ур. с вер. 7) оппоненту в сум. 5 кл." },
+                { name: "В - Винтовка", mana: 10, description: "наносит 10 ур. в сум. от 5 кл. и больше." },
+                { name: "У - Дымовуха", mana: 0, description: "скрывает Сайтера, и он перемещается в любую точку в рад. 7 кл." }
             ] }
         ];
+
+        // Функция для получения класса цвета по имени
+        function getNameColorClass(name) {
+            const colorMap = {
+                "Темпос": "name-cyan",
+                "Гоуст": "name-pink",
+                "Иллюжн": "name-pink",
+                "Форс": "name-pink",
+                "Вита": "name-green",
+                "Аюно": "name-red",
+                "Вампир": "name-red",
+                "Серпенс": "name-red",
+                "Ион": "name-purple",
+                "Айси": "name-purple",
+                "Друид": "name-purple",
+                "Магмус": "name-purple",
+                "Нано": "name-gold",
+                "Кёрс": "name-gold",
+                "Сайтер": "name-gold"
+            };
+            return colorMap[name] || "";
+        }
 
         let selectedIds = [];
 
@@ -202,11 +237,23 @@
                 const card = document.createElement('div');
                 card.className = `character-card ${selectedIds.includes(char.id) ? 'selected' : ''}`;
                 card.dataset.id = char.id;
-                const abilitiesPreview = char.abilities.map(a => `${a.name} (${a.mana} м)`).join(', ');
+                const colorClass = getNameColorClass(char.name);
+                let abilitiesHtml = '<div class="abilities">';
+                char.abilities.forEach(ab => {
+                    abilitiesHtml += `
+                        <div class="ability-item">
+                            <div class="ability-header">
+                                <span class="ability-name">${ab.name}</span>
+                                <span class="ability-cost">${ab.mana} м</span>
+                            </div>
+                            <div class="ability-desc">${ab.description}</div>
+                        </div>
+                    `;
+                });
+                abilitiesHtml += '</div>';
                 card.innerHTML = `
-                    <div class="character-name">${char.name}</div>
-                    <div class="character-hp">❤️ ${char.hp} HP</div>
-                    <div class="abilities">${abilitiesPreview}</div>
+                    <div class="character-name ${colorClass}">${char.name}</div>
+                    ${abilitiesHtml}
                 `;
                 card.addEventListener('click', () => toggleSelection(char.id));
                 grid.appendChild(card);
@@ -240,6 +287,9 @@
                 localStorage.removeItem('currentMana');
                 localStorage.removeItem('charactersHP');
                 localStorage.removeItem('actionHistory');
+                localStorage.removeItem('usedUniqueAbilities');
+                localStorage.removeItem('blockedVenomAbilities');
+                localStorage.removeItem('savedStateBeforeTurn');
                 window.location.href = 'game.html';
             }
         });
