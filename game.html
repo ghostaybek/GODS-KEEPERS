@@ -110,7 +110,6 @@
             text-align: center;
             margin-bottom: 12px;
         }
-        /* Цвета имён */
         .name-cyan { color: #00ffff; }
         .name-pink { color: #ff69b4; }
         .name-green { color: #00ff7f; }
@@ -225,86 +224,84 @@
 
 <script>
     (function() {
-        // ----- ДАННЫЕ ПЕРСОНАЖЕЙ (с описаниями) -----
         const fullCharacters = [
             { id: 1, name: "Темпос", hp: 15, abilities: [
-                { name: "Самурай", mana: 4, description: "рывок на 3 кл., наносящий всем на своём пути 3 ур." },
-                { name: "Рывок", mana: 3, description: "перемещается в сум. 4 кл." },
-                { name: "У - Флэшбэк", mana: 0, description: "отматывает один ход назад." }
+                { name: "Самурай", mana: 4, type: "normal", description: "рывок на сумму 2–4 клеток, наносящий всем на своём пути 3 урона." },
+                { name: "Замедление времени", mana: 3, type: "normal", description: "перемещается в радиус 4 клеток." },
+                { name: "У - Флэшбэк", mana: 0, type: "unique", description: "отматывает один ход назад (используется в любой момент игры)." }
             ] },
             { id: 2, name: "Гоуст", hp: 15, abilities: [
-                { name: "Пистолет-призрак", mana: 4, description: "наносит 2 ур. в сум. 4 кл. (может стрелять сквозь стены)." },
-                { name: "Телепорт", mana: 4, description: "в рад. 5 кл." },
-                { name: "У - Портал", mana: 4, description: "создаёт 2 портала в 2 любых точках карты (может убрать их в любой момент)." }
+                { name: "Пистолет-призрак", mana: 4, type: "normal", description: "наносит 2 урона в сумме 4 клеток (может стрелять сквозь стены)." },
+                { name: "Телепорт", mana: 4, type: "normal", description: "в радиусе 5 клеток." },
+                { name: "У - Портал", mana: 4, type: "unique", description: "создаёт 2 портала в 2 любых точках карты (может убрать их в любой момент)." }
             ] },
             { id: 3, name: "Иллюжн", hp: 15, abilities: [
-                { name: "Клинок", mana: 4, description: "наносит 5 ур. в рад. 1 кл." },
-                { name: "Иллюзия", mana: 4, description: "оппонент в сум. 6 кл. наносит сам себе 3 ур." },
-                { name: "У - Другой мир", mana: 9, description: "управляет оппонентом в течение 1 хода (Иллюжн тратит свою ману)." }
+                { name: "Кинжал", mana: 3, type: "normal", description: "наносит 5 урона в радиусе 1 клетки." },
+                { name: "Иллюзия", mana: 4, type: "normal", description: "оппонент в сумме 5 клеток притягивается к Иллюжну на 3 клетки." },
+                { name: "У - Другой мир", mana: 5, type: "unique", description: "управляет оппонентом в сумме 1+ клеток в течение 1 хода (Иллюжн тратит ману своей команды)." }
             ] },
             { id: 4, name: "Форс", hp: 15, abilities: [
-                { name: "Натиск саев", mana: 6, description: "наносит 4 ур. в сум. 6 кл." },
-                { name: "Притяжение оппонента", mana: 6, description: "притягивает выбранного оппонента на 2 кл." },
-                { name: "У - Телекинез", mana: 3, description: "перемещает всех Хранителей на 2 кл." }
+                { name: "Натиск саев", mana: 6, type: "normal", description: "наносит 4 урона в радиусе 4 клеток." },
+                { name: "Отталкивание оппонента", mana: 5, type: "normal", description: "отталкивает выбранного оппонента в радиусе 4 клеток или в сумме 6 клеток на 1–2 клетки." },
+                { name: "У - Телекинез", mana: 7, type: "unique", description: "перемещает всех Хранителей на 2 клетки." }
             ] },
             { id: 5, name: "Вита", hp: 15, abilities: [
-                { name: "Зеркало миротворца", mana: 6, description: "отражает суммарный урон от оппонента, нанося ему на 1 ур. меньше." },
-                { name: "Жизни", mana: 8, description: "восстанавливает 3 хп себе или союзнику." },
-                { name: "У - Лечение Хранителя", mana: 5, description: "воскрешает союзника, после воскрешения у него 5 хп." }
+                { name: "Зеркало миротворца", mana: 5, type: "normal", description: "отражает суммарный урон от оппонента, нанося ему на 1 урон (используется в ход оппонента)." },
+                { name: "Жизни", mana: 7, type: "normal", description: "восстанавливает 3 хп себе или союзнику." },
+                { name: "У - Лечение Хранителя", mana: 5, type: "unique", description: "воскрешает союзника, после воскрешения у него 5 хп." }
             ] },
             { id: 6, name: "Аюно", hp: 15, abilities: [
-                { name: "Посох смерти", mana: 2, description: "наносит 2 ур. в сум. 6 кл." },
-                { name: "В - Призыв скелета", mana: 9, description: "у него 5 хп и ур. 3 в рад. 1 кл. или 2 ур. в сум. 4 кл." },
-                { name: "П - Воскрешение", mana: 0, description: "после смерти воскрешается в рад. 10 кл. от места смерти с 1 хп." }
+                { name: "Посох смерти", mana: 2, type: "normal", description: "наносит 2 урона в сумме 4 клеток." },
+                { name: "В - Призыв скелета", mana: 8, type: "venom", description: "у него 5 хп и урон 4 в радиусе 1 клетки или 2 урона в сумме 4 клеток (им можно управлять)." },
+                { name: "У - Воскрешение", mana: 0, type: "unique", description: "после смерти воскрешается в радиусе 10 клеток от места смерти с 1 хп." }
             ] },
             { id: 7, name: "Вампир", hp: 15, abilities: [
-                { name: "Умбра", mana: 6, description: "двуручный клинок, наносящий 5 ур. в рад. 2 кл., прибавляющий 2 хп Вампиру после попадания." },
-                { name: "Жизненное высасывание", mana: 8, description: "вампирская магия, высасывающая 3 хп из Хранителя в сум. 6 кл." },
-                { name: "У- Бессмертие", mana: 0, description: "когда у Вампира остаётся 6 хп или меньше, высасывает 3 хп из ближайшего оппонента." }
+                { name: "Умбра (двуручный клинок)", mana: 6, type: "normal", description: "наносит 5 урона в радиусе 2 клеток, прибавляющий 1 хп Вампиру." },
+                { name: "Жизненное высасывание", mana: 6, type: "normal", description: "вампирская магия, высасывающая 2 хп из Хранителя в сумме 5 клеток." },
+                { name: "В - Бессмертие", mana: 0, type: "venom", description: "когда у Вампира остаётся 6 хп или меньше, высасывает 2 хп из ближайшего оппонента (используется в ход оппонента)." }
             ] },
             { id: 8, name: "Серпенс", hp: 15, abilities: [
-                { name: "Р - Ядовитый выстрел", mana: 5, description: "наносит 5 ур. с вер. 6 в сум. 6 кл., при попадании следующим ходом наносит ещё 2 ур." },
-                { name: "В - Призыв змеи", mana: 9, description: "она наносит 4 ур. ядом в рад. 3 кл., который следующий ход наносит ещё 2 ур." },
-                { name: "П - Плотная чешуя", mana: 0, description: "у Серпенса 18 хп с начала игры." }
+                { name: "Ядовитый выстрел", mana: 4, type: "normal", description: "наносит 5 урона с вероятностью 6 в сумме 6 клеток." },
+                { name: "В - Призыв змеи", mana: 10, type: "venom", description: "у неё 6 хп, она наносит 4 урона ядом в радиусе 3 клеток (на карте может быть только 1 змея)." },
+                { name: "П - Плотная чешуя", mana: 0, type: "normal", description: "у Серпенса 18 хп с начала игры." }
             ] },
             { id: 9, name: "Ион", hp: 15, abilities: [
-                { name: "Молнии из рук", mana: 4, description: "наносит 3 ур. всем оппонентам в рад. 3 кл." },
-                { name: "Разряд молнии", mana: 4, description: "наносит 2 ур. в рад. 4 кл. и не даёт оппоненту нанести ур. в след. ходу." },
-                { name: "П - Энергия", mana: 0, description: "бесплатно может передвигаться на 1 кл. каждый ход." }
+                { name: "Молнии из рук", mana: 4, type: "normal", description: "наносит 3 урона всем оппонентам в радиусе 3 клеток." },
+                { name: "Разряд молнии", mana: 4, type: "normal", description: "наносит 2 урона в радиусе 4 клеток и не даёт оппоненту нанести урон в следующем ходу." },
+                { name: "П - Энергия", mana: 0, type: "normal", description: "бесплатно может передвигаться на 1 клетку каждый ход." }
             ] },
             { id: 10, name: "Айси", hp: 15, abilities: [
-                { name: "Ледяные шипы", mana: 4, description: "стреляет ледяными шипами по всем диагоналям в рад. 3 кл., нанося 4 ур." },
-                { name: "Скольжение", mana: 1, description: "скользит на 1 кл. по диагонали." },
-                { name: "У - Заморозка", mana: 8, description: "все оппоненты в рад. 7 кл. пропускают ход, с каждым замёрзшим оппонентом снижено получение маны соперника за ход." }
+                { name: "Ледяные шипы", mana: 3, type: "normal", description: "стреляет ледяными шипами по всем диагоналям в радиусе 3 клеток, нанося 4 урона." },
+                { name: "Скольжение", mana: 1, type: "normal", description: "скользит на 1 клетку по диагонали." },
+                { name: "У - Заморозка", mana: 9, type: "unique", description: "все оппоненты в радиусе 7 клеток пропускают ход, с каждым замёрзшим оппонентом снижено получение маны соперника за ход." }
             ] },
             { id: 11, name: "Друид", hp: 15, abilities: [
-                { name: "Деревянный лук", mana: 5, description: "наносит 3 ур. в сум. 10 кл. (может стрелять через стены)." },
-                { name: "В - Древесный захват", mana: 10, description: "оппонента в сум. 5 кл. захватывают деревья, чтобы спасти его, союзник должен подбежать к пойманному и потратить 7 маны, иначе деревья забирают жизнь пойманного." },
-                { name: "У - Лечебные растения", mana: 10, description: "восстанавливает 2 хп каждому союзнику." }
+                { name: "Деревянный лук", mana: 5, type: "normal", description: "наносит 3 урона в радиусе 5 клеток (может стрелять через стены)." },
+                { name: "В - Древесный захват", mana: 10, type: "venom", description: "оппонента в радиусе 5 клеток захватывают деревья; чтобы спасти его, союзник должен подбежать к пойманному и потратить 7 маны, иначе деревья убивают его." },
+                { name: "У - Лечебные растения", mana: 12, type: "unique", description: "восстанавливает 3 хп каждому союзнику и себе." }
             ] },
             { id: 12, name: "Магмус", hp: 15, abilities: [
-                { name: "Оружия лавы", mana: 6, description: "наносит оппоненту в рад. 1 кл. 7 ур." },
-                { name: "Р - Огненный шар", mana: 3, description: "наносит 5 ур. с вер. 5 в сум. 5 кл." },
-                { name: "У - Землетрясение", mana: 0, description: "меняет 2 любые кл. местами." }
+                { name: "Лавовый клинок", mana: 5, type: "normal", description: "наносит оппоненту в радиусе 1 кл. 7 урона." },
+                { name: "Огненный дракон", mana: 3, type: "normal", description: "наносит 5 урона с вероятностью 5 в сумме 5 клеток." },
+                { name: "В - Лавовый щит", mana: 2, type: "venom", description: "поглощает 2 урона от атаки (используется в ход оппонента)." }
             ] },
             { id: 13, name: "Нано", hp: 15, abilities: [
-                { name: "Р - Подрывные пули", mana: 6, description: "делает 2 выстрела (каждый наносит 3 ур. с вер. 6) оппоненту в сум. 7 кл." },
-                { name: "В - Динамит", mana: 4, description: "устанавливает бомбу, наносящую 5 ур., если враг наступит на неё." },
-                { name: "У - Нано-жук", mana: 4, description: "уклоняется от любой атаки оппонента." }
+                { name: "Подрывные пули", mana: 6, type: "normal", description: "делает 2 выстрела (каждый наносит 3 урона с вероятностью 6) оппоненту в сумме 6 клеток." },
+                { name: "В - Динамит", mana: 4, type: "venom", description: "устанавливает бомбу в сумме 2 клеток, наносящую 5 урона, если враг наступит на неё (на карте может быть только 1 динамит)." },
+                { name: "У - Нано-жук", mana: 4, type: "unique", description: "уклоняется от любой атаки оппонента." }
             ] },
             { id: 14, name: "Кёрс", hp: 15, abilities: [
-                { name: "Р - Миниган", mana: 6, description: "делает 3 выстрела (каждый наносит 2 ур. с вер. 7) оппоненту в сум. 6 кл." },
-                { name: "В - Ракетница", mana: 12, description: "летит в любую точку карты и наносит 8 ур., 7 ур. в рад. 1 кл. от точки, 6 ур. в рад. 2 кл." },
-                { name: "П - Скорость", mana: 0, description: "бесплатно может передвигаться на 2 кл. каждый ход." }
+                { name: "Миниган", mana: 6, type: "normal", description: "делает 3 выстрела (каждый наносит 2 урона с вероятностью 7) оппоненту в сумме 5 клеток." },
+                { name: "В - Ракетница", mana: 12, type: "venom", description: "летит в любую точку карты и наносит 8 урона, 7 урона в радиусе 1 клетки от точки, 6 урона — в радиусе 2 клеток; чтобы увернуться от неё, оппоненту даётся 1 ход." },
+                { name: "П - Скорость", mana: 0, type: "normal", description: "бесплатно может передвигаться на 2 клетки каждый ход." }
             ] },
             { id: 15, name: "Сайтер", hp: 15, abilities: [
-                { name: "Р - Револьвер", mana: 6, description: "делает 2 выстрела (каждый наносят 3 ур. с вер. 7) оппоненту в сум. 5 кл." },
-                { name: "В - Винтовка", mana: 10, description: "наносит 10 ур. в сум. от 5 кл. и больше." },
-                { name: "У - Дымовуха", mana: 0, description: "скрывает Сайтера, и он перемещается в любую точку в рад. 7 кл." }
+                { name: "Револьвер", mana: 6, type: "normal", description: "делает 2 выстрела (каждый наносит 3 урона с вероятностью 7) оппоненту в сумме 4 клеток." },
+                { name: "В - Винтовка", mana: 10, type: "venom", description: "наносит 10 урона в сумме 4+ клеток." },
+                { name: "У - Дымовуха", mana: 0, type: "unique", description: "скрывает Сайтера, и он перемещается в любую точку в радиусе 7 клеток." }
             ] }
         ];
 
-        // Функция для получения класса цвета по имени
         function getNameColorClass(name) {
             const colorMap = {
                 "Темпос": "name-cyan",
@@ -333,12 +330,6 @@
         let usedUniqueAbilities = {};
         let blockedVenomAbilities = {};
         let savedStateBeforeTurn = null;
-
-        function getAbilityType(abilityName) {
-            if (abilityName.startsWith("У -") || abilityName.startsWith("У-")) return "unique";
-            if (abilityName.startsWith("В -") || abilityName.startsWith("В-")) return "venom";
-            return "normal";
-        }
 
         function persistState() {
             localStorage.setItem('currentMana', currentMana);
@@ -460,12 +451,11 @@
                 const abilityBtns = card.querySelectorAll('.ability-btn');
                 abilityBtns.forEach((btn, idx) => {
                     const ability = char.abilities[idx];
-                    const type = getAbilityType(ability.name);
                     const key = `${charId}_${idx}`;
                     let disabled = false;
-                    if (type === 'unique') {
+                    if (ability.type === 'unique') {
                         disabled = usedUniqueAbilities[key] === true;
-                    } else if (type === 'venom') {
+                    } else if (ability.type === 'venom') {
                         disabled = blockedVenomAbilities[key] === true;
                     }
                     if (currentMana < ability.mana) disabled = true;
@@ -541,14 +531,13 @@
 
         function useAbility(character, abilityIdx) {
             const ability = character.abilities[abilityIdx];
-            const type = getAbilityType(ability.name);
             const key = `${character.id}_${abilityIdx}`;
 
-            if (type === 'unique' && usedUniqueAbilities[key]) {
+            if (ability.type === 'unique' && usedUniqueAbilities[key]) {
                 alert('Эта способность уже использована один раз за игру!');
                 return;
             }
-            if (type === 'venom' && blockedVenomAbilities[key]) {
+            if (ability.type === 'venom' && blockedVenomAbilities[key]) {
                 alert('Эта способность временно недоступна. Убейте врага, чтобы восстановить её.');
                 return;
             }
@@ -561,13 +550,13 @@
             actionHistory.push({
                 type: 'ability',
                 abilityKey: key,
-                abilityType: type,
+                abilityType: ability.type,
                 cost: ability.mana
             });
 
-            if (type === 'unique') {
+            if (ability.type === 'unique') {
                 usedUniqueAbilities[key] = true;
-            } else if (type === 'venom') {
+            } else if (ability.type === 'venom') {
                 blockedVenomAbilities[key] = true;
             }
 
