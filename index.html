@@ -121,9 +121,9 @@
     </style>
 </head>
 <body>
-    <h1>⚔️ Выберите 5 хранителей ⚔️</h1>
+    <h1>⚔️ Выберите команду хранителей ⚔️</h1>
     <div id="characters-grid" class="characters-grid"></div>
-    <button id="ready-btn" disabled>Команда готова</button>
+    <button id="ready-btn">Команда готова</button>
     <div id="message" class="message"></div>
 
     <script>
@@ -150,7 +150,7 @@
             ] },
             { id: 5, name: "Вита", hp: 15, abilities: [
                 { name: "Зеркало миротворца", mana: 5, type: "normal", description: "отражает суммарный урон от оппонента, нанося ему на 1 урон (используется в ход оппонента)." },
-                { name: "Жизни", mana: 7, type: "normal", description: "восстанавливает 3 хп себе или союзнику." },
+                { name: "Жизни", mana: 7, type: "normal", description: "восстанавливает 3 хп себе или союзнику в радиусе 3 клеток." },
                 { name: "У - Лечение Хранителя", mana: 5, type: "unique", description: "воскрешает союзника, после воскрешения у него 5 хп." }
             ] },
             { id: 6, name: "Аюно", hp: 15, abilities: [
@@ -159,11 +159,11 @@
                 { name: "У - Воскрешение", mana: 0, type: "unique", description: "после смерти воскрешается в радиусе 10 клеток от места смерти с 1 хп." }
             ] },
             { id: 7, name: "Вампир", hp: 15, abilities: [
-                { name: "Умбра (двуручный клинок)", mana: 6, type: "normal", description: "наносит 5 урона в радиусе 2 клеток, прибавляющий 1 хп Вампиру." },
+                { name: "Умбра", mana: 6, type: "normal", description: "наносит 5 урона в радиусе 2 клеток, прибавляющий 1 хп Вампиру." },
                 { name: "Жизненное высасывание", mana: 6, type: "normal", description: "вампирская магия, высасывающая 2 хп из Хранителя в сумме 5 клеток." },
                 { name: "В - Бессмертие", mana: 0, type: "venom", description: "когда у Вампира остаётся 6 хп или меньше, высасывает 2 хп из ближайшего оппонента (используется в ход оппонента)." }
             ] },
-            { id: 8, name: "Серпенс", hp: 15, abilities: [
+            { id: 8, name: "Серпенс", hp: 18, abilities: [
                 { name: "Ядовитый выстрел", mana: 4, type: "normal", description: "наносит 5 урона с вероятностью 6 в сумме 6 клеток." },
                 { name: "В - Призыв змеи", mana: 10, type: "venom", description: "у неё 6 хп, она наносит 4 урона ядом в радиусе 3 клеток (на карте может быть только 1 змея)." },
                 { name: "П - Плотная чешуя", mana: 0, type: "normal", description: "у Серпенса 18 хп с начала игры." }
@@ -185,7 +185,7 @@
             ] },
             { id: 12, name: "Магмус", hp: 15, abilities: [
                 { name: "Лавовый клинок", mana: 5, type: "normal", description: "наносит оппоненту в радиусе 1 кл. 7 урона." },
-                { name: "Огненный дракон", mana: 3, type: "normal", description: "наносит 5 урона с вероятностью 5 в сумме 5 клеток." },
+                { name: "Лавовый плевок", mana: 3, type: "normal", description: "наносит 5 урона с вероятностью 5 в сумме 5 клеток." },
                 { name: "В - Лавовый щит", mana: 2, type: "venom", description: "поглощает 2 урона от атаки (используется в ход оппонента)." }
             ] },
             { id: 13, name: "Нано", hp: 15, abilities: [
@@ -261,39 +261,26 @@
         function toggleSelection(id) {
             const index = selectedIds.indexOf(id);
             if (index === -1) {
-                if (selectedIds.length >= 5) {
-                    document.getElementById('message').textContent = 'Можно выбрать только 5 хранителей!';
-                    return;
-                }
                 selectedIds.push(id);
             } else {
                 selectedIds.splice(index, 1);
             }
-            document.getElementById('message').textContent = '';
             renderCharacters();
-            updateReadyButton();
-        }
-
-        function updateReadyButton() {
-            const btn = document.getElementById('ready-btn');
-            btn.disabled = selectedIds.length !== 5;
         }
 
         document.getElementById('ready-btn').addEventListener('click', () => {
-            if (selectedIds.length === 5) {
-                localStorage.setItem('selectedCharacters', JSON.stringify(selectedIds));
-                localStorage.removeItem('currentMana');
-                localStorage.removeItem('charactersHP');
-                localStorage.removeItem('actionHistory');
-                localStorage.removeItem('usedUniqueAbilities');
-                localStorage.removeItem('blockedVenomAbilities');
-                localStorage.removeItem('savedStateBeforeTurn');
-                window.location.href = 'game.html';
-            }
+            localStorage.setItem('selectedCharacters', JSON.stringify(selectedIds));
+            localStorage.removeItem('currentMana');
+            localStorage.removeItem('charactersHP');
+            localStorage.removeItem('actionHistory');
+            localStorage.removeItem('usedUniqueAbilities');
+            localStorage.removeItem('blockedVenomAbilities');
+            localStorage.removeItem('savedStateBeforeTurn');
+            localStorage.removeItem('notes'); // очищаем заметки при новом выборе
+            window.location.href = 'game.html';
         });
 
         renderCharacters();
-        updateReadyButton();
     </script>
 </body>
 </html>

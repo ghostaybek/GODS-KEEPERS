@@ -12,6 +12,7 @@
             color: #eee;
             margin: 0;
             padding: 16px;
+            padding-top: 0;
         }
         .container { max-width: 1400px; margin: 0 auto; }
         .header {
@@ -25,6 +26,9 @@
             gap: 12px;
             margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .mana-display {
             font-size: 1.5rem;
@@ -93,33 +97,21 @@
         .random-btn:hover { background: #9b59b6; }
         .change-team-btn { background: #6a4e3a; }
         .change-team-btn:hover { background: #7e5d46; }
-       .characters-grid {
-    display: grid;
-    gap: 20px;
-    margin: 0 auto;
-    max-width: 1400px;
-}
-
-/* Мобильные */
-@media (max-width: 767px) {
-    .characters-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Планшеты */
-@media (min-width: 768px) and (max-width: 1199px) {
-    .characters-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Ноутбуки и шире — 5 колонок в ряд */
-@media (min-width: 1200px) {
-    .characters-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
+        .characters-grid {
+            display: grid;
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 1400px;
+        }
+        @media (max-width: 767px) {
+            .characters-grid { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .characters-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1200px) {
+            .characters-grid { grid-template-columns: repeat(5, 1fr); }
+        }
         .character-card {
             background: #1e2f3a;
             border-radius: 24px;
@@ -179,6 +171,10 @@
             background: #2a3f4a;
             border-radius: 16px;
             overflow: hidden;
+            cursor: pointer;
+        }
+        .ability-wrapper:hover {
+            background: #3f5e6b;
         }
         .ability-btn {
             background: #3f5e6b;
@@ -189,6 +185,11 @@
             justify-content: space-between;
             font-size: 0.95rem;
             border-radius: 0;
+            cursor: pointer;
+        }
+        .ability-btn:disabled {
+            background: #2c4a3e;
+            cursor: not-allowed;
         }
         .ability-name { font-weight: bold; }
         .ability-cost {
@@ -203,6 +204,32 @@
             color: #ccc;
             line-height: 1.3;
         }
+        .notes-section {
+            margin-top: 30px;
+            background: #1e2f3a;
+            border-radius: 24px;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .notes-section textarea {
+            flex: 1;
+            background: #2a3f4a;
+            color: white;
+            border: 1px solid #4a6a7a;
+            border-radius: 16px;
+            padding: 12px;
+            font-size: 0.9rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .notes-section button {
+            margin: 0;
+            background: #6a4e3a;
+            padding: 12px 20px;
+        }
         @media (max-width: 600px) {
             body { padding: 12px; }
             .characters-grid { grid-template-columns: 1fr; gap: 16px; }
@@ -213,6 +240,7 @@
             .move-global input { width: 85px; }
             button { padding: 8px 14px; font-size: 0.85rem; }
             .mana-display { font-size: 1.2rem; }
+            .notes-section { flex-direction: column; }
         }
         .error-message {
             background: #a12f2f;
@@ -242,10 +270,15 @@
         </div>
     </div>
     <div id="characters-grid" class="characters-grid"></div>
+    <div class="notes-section">
+        <textarea id="notes-text" rows="3" placeholder="Ваши заметки..."></textarea>
+        <button id="save-notes-btn">💾 Применить изменения</button>
+    </div>
 </div>
 
 <script>
     (function() {
+        // ----- ДАННЫЕ ПЕРСОНАЖЕЙ (обновлённые) -----
         const fullCharacters = [
             { id: 1, name: "Темпос", hp: 15, abilities: [
                 { name: "Самурай", mana: 4, type: "normal", description: "рывок на сумму 2–4 клеток, наносящий всем на своём пути 3 урона." },
@@ -269,7 +302,7 @@
             ] },
             { id: 5, name: "Вита", hp: 15, abilities: [
                 { name: "Зеркало миротворца", mana: 5, type: "normal", description: "отражает суммарный урон от оппонента, нанося ему на 1 урон (используется в ход оппонента)." },
-                { name: "Жизни", mana: 7, type: "normal", description: "восстанавливает 3 хп себе или союзнику." },
+                { name: "Жизни", mana: 7, type: "normal", description: "восстанавливает 3 хп себе или союзнику в радиусе 3 клеток." },
                 { name: "У - Лечение Хранителя", mana: 5, type: "unique", description: "воскрешает союзника, после воскрешения у него 5 хп." }
             ] },
             { id: 6, name: "Аюно", hp: 15, abilities: [
@@ -278,11 +311,11 @@
                 { name: "У - Воскрешение", mana: 0, type: "unique", description: "после смерти воскрешается в радиусе 10 клеток от места смерти с 1 хп." }
             ] },
             { id: 7, name: "Вампир", hp: 15, abilities: [
-                { name: "Умбра (двуручный клинок)", mana: 6, type: "normal", description: "наносит 5 урона в радиусе 2 клеток, прибавляющий 1 хп Вампиру." },
+                { name: "Умбра", mana: 6, type: "normal", description: "наносит 5 урона в радиусе 2 клеток, прибавляющий 1 хп Вампиру." },
                 { name: "Жизненное высасывание", mana: 6, type: "normal", description: "вампирская магия, высасывающая 2 хп из Хранителя в сумме 5 клеток." },
                 { name: "В - Бессмертие", mana: 0, type: "venom", description: "когда у Вампира остаётся 6 хп или меньше, высасывает 2 хп из ближайшего оппонента (используется в ход оппонента)." }
             ] },
-            { id: 8, name: "Серпенс", hp: 15, abilities: [
+            { id: 8, name: "Серпенс", hp: 18, abilities: [
                 { name: "Ядовитый выстрел", mana: 4, type: "normal", description: "наносит 5 урона с вероятностью 6 в сумме 6 клеток." },
                 { name: "В - Призыв змеи", mana: 10, type: "venom", description: "у неё 6 хп, она наносит 4 урона ядом в радиусе 3 клеток (на карте может быть только 1 змея)." },
                 { name: "П - Плотная чешуя", mana: 0, type: "normal", description: "у Серпенса 18 хп с начала игры." }
@@ -304,7 +337,7 @@
             ] },
             { id: 12, name: "Магмус", hp: 15, abilities: [
                 { name: "Лавовый клинок", mana: 5, type: "normal", description: "наносит оппоненту в радиусе 1 кл. 7 урона." },
-                { name: "Огненный дракон", mana: 3, type: "normal", description: "наносит 5 урона с вероятностью 5 в сумме 5 клеток." },
+                { name: "Лавовый плевок", mana: 3, type: "normal", description: "наносит 5 урона с вероятностью 5 в сумме 5 клеток." },
                 { name: "В - Лавовый щит", mana: 2, type: "venom", description: "поглощает 2 урона от атаки (используется в ход оппонента)." }
             ] },
             { id: 13, name: "Нано", hp: 15, abilities: [
@@ -324,6 +357,16 @@
             ] }
         ];
 
+        // Данные скелета
+        const skeletonData = {
+            id: 999,
+            name: "Скелет",
+            hp: 5,
+            abilities: [
+                { name: "Копьё", mana: 3, type: "normal", description: "наносит 3 урона в радиусе 2 клеток или 2 урона в сумме 4 клеток." }
+            ]
+        };
+
         function getNameColorClass(name) {
             const colorMap = {
                 "Темпос": "name-cyan",
@@ -340,7 +383,8 @@
                 "Магмус": "name-purple",
                 "Нано": "name-gold",
                 "Кёрс": "name-gold",
-                "Сайтер": "name-gold"
+                "Сайтер": "name-gold",
+                "Скелет": "name-gold"
             };
             return colorMap[name] || "";
         }
@@ -351,25 +395,83 @@
         let actionHistory = [];
         let usedUniqueAbilities = {};
         let blockedVenomAbilities = {};
-        let savedStateBeforeTurn = null;
 
+        // История ходов (массив состояний)
+        let turnHistory = []; // каждый элемент - копия состояния { currentMana, charactersHP, usedUniqueAbilities, blockedVenomAbilities, selectedCharacters }
+
+        function hasSkeleton() {
+            return selectedCharacters.some(c => c.id === skeletonData.id);
+        }
+
+        function addSkeleton() {
+            if (hasSkeleton()) return false;
+            selectedCharacters.push(JSON.parse(JSON.stringify(skeletonData)));
+            charactersHP[skeletonData.id] = skeletonData.hp;
+            return true;
+        }
+
+        function removeSkeleton() {
+            const index = selectedCharacters.findIndex(c => c.id === skeletonData.id);
+            if (index !== -1) {
+                selectedCharacters.splice(index, 1);
+                delete charactersHP[skeletonData.id];
+                return true;
+            }
+            return false;
+        }
+
+        // Сохранение текущего состояния в историю ходов (перед завершением хода)
+        function pushToTurnHistory() {
+            const state = {
+                currentMana: currentMana,
+                charactersHP: { ...charactersHP },
+                usedUniqueAbilities: { ...usedUniqueAbilities },
+                blockedVenomAbilities: { ...blockedVenomAbilities },
+                selectedCharacters: JSON.parse(JSON.stringify(selectedCharacters))
+            };
+            turnHistory.push(state);
+            persistState();
+        }
+
+        // Откат к последнему сохранённому состоянию хода
+        function popTurnHistory() {
+            if (turnHistory.length === 0) {
+                alert('Нет сохранённых ходов для отката');
+                return false;
+            }
+            const state = turnHistory.pop();
+            currentMana = state.currentMana;
+            charactersHP = { ...state.charactersHP };
+            usedUniqueAbilities = { ...state.usedUniqueAbilities };
+            blockedVenomAbilities = { ...state.blockedVenomAbilities };
+            selectedCharacters = JSON.parse(JSON.stringify(state.selectedCharacters));
+            actionHistory = []; // очищаем историю действий текущего хода
+            persistState();
+            return true;
+        }
+
+        // Сохранение всех данных в localStorage
         function persistState() {
             localStorage.setItem('currentMana', currentMana);
             localStorage.setItem('charactersHP', JSON.stringify(charactersHP));
             localStorage.setItem('actionHistory', JSON.stringify(actionHistory));
             localStorage.setItem('usedUniqueAbilities', JSON.stringify(usedUniqueAbilities));
             localStorage.setItem('blockedVenomAbilities', JSON.stringify(blockedVenomAbilities));
-            if (savedStateBeforeTurn) {
-                localStorage.setItem('savedStateBeforeTurn', JSON.stringify(savedStateBeforeTurn));
-            } else {
-                localStorage.removeItem('savedStateBeforeTurn');
-            }
+            localStorage.setItem('turnHistory', JSON.stringify(turnHistory));
+            const charsToSave = selectedCharacters.map(c => ({
+                id: c.id,
+                name: c.name,
+                hp: c.hp,
+                abilities: c.abilities.map(a => ({ ...a }))
+            }));
+            localStorage.setItem('selectedCharactersFull', JSON.stringify(charsToSave));
         }
 
+        // Загрузка состояния из localStorage
         function loadGameState() {
             const savedIds = localStorage.getItem('selectedCharacters');
             if (!savedIds) {
-                showError('Не выбрана команда. Пожалуйста, выберите 5 персонажей на главной странице.');
+                showError('Не выбрана команда. Пожалуйста, выберите персонажей на главной странице.');
                 return false;
             }
             let ids;
@@ -379,13 +481,20 @@
                 showError('Ошибка чтения данных. Попробуйте выбрать команду заново.');
                 return false;
             }
-            if (!Array.isArray(ids) || ids.length !== 5) {
-                showError('Выбрано не 5 персонажей. Вернитесь и выберите ровно 5.');
-                return false;
+            let baseChars = fullCharacters.filter(c => ids.includes(c.id));
+            const savedFull = localStorage.getItem('selectedCharactersFull');
+            if (savedFull) {
+                try {
+                    const fullSaved = JSON.parse(savedFull);
+                    const savedSkeleton = fullSaved.find(c => c.id === skeletonData.id);
+                    if (savedSkeleton) {
+                        baseChars.push(savedSkeleton);
+                    }
+                } catch(e) {}
             }
-            selectedCharacters = fullCharacters.filter(c => ids.includes(c.id));
-            if (selectedCharacters.length !== 5) {
-                showError('Не удалось загрузить выбранных персонажей. Попробуйте снова.');
+            selectedCharacters = baseChars;
+            if (selectedCharacters.length === 0) {
+                showError('Не удалось загрузить персонажей. Попробуйте снова.');
                 return false;
             }
 
@@ -407,6 +516,8 @@
                 try {
                     actionHistory = JSON.parse(savedHistory);
                 } catch(e) { actionHistory = []; }
+            } else {
+                actionHistory = [];
             }
 
             const savedUnique = localStorage.getItem('usedUniqueAbilities');
@@ -427,11 +538,13 @@
                 blockedVenomAbilities = {};
             }
 
-            const savedTurn = localStorage.getItem('savedStateBeforeTurn');
-            if (savedTurn) {
+            const savedTurnHistory = localStorage.getItem('turnHistory');
+            if (savedTurnHistory) {
                 try {
-                    savedStateBeforeTurn = JSON.parse(savedTurn);
-                } catch(e) { savedStateBeforeTurn = null; }
+                    turnHistory = JSON.parse(savedTurnHistory);
+                } catch(e) { turnHistory = []; }
+            } else {
+                turnHistory = [];
             }
 
             return true;
@@ -525,32 +638,44 @@
             updateUI();
         }
 
-        function saveStateForUndoTurn() {
-            savedStateBeforeTurn = {
-                currentMana: currentMana,
-                charactersHP: { ...charactersHP },
-                usedUniqueAbilities: { ...usedUniqueAbilities },
-                blockedVenomAbilities: { ...blockedVenomAbilities }
-            };
-            persistState();
-        }
-
-        function undoLastTurn() {
-            if (!savedStateBeforeTurn) {
-                alert('Нет сохранённого хода для отката');
+        // Откат последнего действия внутри текущего хода (кнопка "Назад")
+        function undo() {
+            if (actionHistory.length === 0) {
+                alert('Нет действий для отмены');
                 return;
             }
-            currentMana = savedStateBeforeTurn.currentMana;
-            charactersHP = { ...savedStateBeforeTurn.charactersHP };
-            usedUniqueAbilities = { ...savedStateBeforeTurn.usedUniqueAbilities };
-            blockedVenomAbilities = { ...savedStateBeforeTurn.blockedVenomAbilities };
-            actionHistory = [];
+            const last = actionHistory.pop();
+            switch (last.type) {
+                case 'ability':
+                    currentMana = clampMana(currentMana + last.cost);
+                    if (last.abilityType === 'unique') {
+                        delete usedUniqueAbilities[last.abilityKey];
+                    } else if (last.abilityType === 'venom') {
+                        delete blockedVenomAbilities[last.abilityKey];
+                    }
+                    break;
+                case 'move':
+                    currentMana = clampMana(currentMana + last.cost);
+                    break;
+                case 'hpChange':
+                    charactersHP[last.charId] -= last.delta;
+                    const hpSpan = document.querySelector(`.character-card[data-id='${last.charId}'] .hp-value`);
+                    if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[last.charId]}`;
+                    break;
+                case 'summonSkeleton':
+                    currentMana = clampMana(currentMana + last.cost);
+                    removeSkeleton();
+                    if (last.abilityType === 'venom') {
+                        delete blockedVenomAbilities[last.abilityKey];
+                    }
+                    break;
+            }
             persistState();
             renderCharacters();
             updateUI();
-            alert('Ход откачён! Состояние восстановлено.');
         }
 
+        // Использование способности
         function useAbility(character, abilityIdx) {
             const ability = character.abilities[abilityIdx];
             const key = `${character.id}_${abilityIdx}`;
@@ -568,6 +693,30 @@
                 return;
             }
 
+            // Призыв скелета
+            if (character.id === 6 && abilityIdx === 1 && ability.name === "В - Призыв скелета") {
+                if (hasSkeleton()) {
+                    alert('Скелет уже призван! На поле может быть только один скелет.');
+                    return;
+                }
+                currentMana = clampMana(currentMana - ability.mana);
+                addSkeleton();
+                actionHistory.push({
+                    type: 'summonSkeleton',
+                    abilityKey: key,
+                    abilityType: ability.type,
+                    cost: ability.mana
+                });
+                if (ability.type === 'venom') {
+                    blockedVenomAbilities[key] = true;
+                }
+                persistState();
+                renderCharacters();
+                updateUI();
+                return;
+            }
+
+            // Обычное использование
             currentMana = clampMana(currentMana - ability.mana);
             actionHistory.push({
                 type: 'ability',
@@ -623,40 +772,22 @@
             }
         }
 
-        function undo() {
-            if (actionHistory.length === 0) {
-                alert('Нет действий для отмены');
-                return;
-            }
-            const last = actionHistory.pop();
-            switch (last.type) {
-                case 'ability':
-                    currentMana = clampMana(currentMana + last.cost);
-                    if (last.abilityType === 'unique') {
-                        delete usedUniqueAbilities[last.abilityKey];
-                    } else if (last.abilityType === 'venom') {
-                        delete blockedVenomAbilities[last.abilityKey];
-                    }
-                    break;
-                case 'move':
-                    currentMana = clampMana(currentMana + last.cost);
-                    break;
-                case 'hpChange':
-                    charactersHP[last.charId] -= last.delta;
-                    const hpSpan = document.querySelector(`.character-card[data-id='${last.charId}'] .hp-value`);
-                    if (hpSpan) hpSpan.textContent = `❤️ ${charactersHP[last.charId]}`;
-                    break;
-            }
-            persistState();
-            updateUI();
-        }
-
         function endTurn() {
-            saveStateForUndoTurn();
+            // Сохраняем текущее состояние в историю ходов
+            pushToTurnHistory();
+            // Завершаем ход: добавляем ману, сбрасываем историю действий
             currentMana = clampMana(currentMana + 5);
             actionHistory = [];
             persistState();
             location.reload();
+        }
+
+        function undoLastTurn() {
+            if (popTurnHistory()) {
+                renderCharacters();
+                updateUI();
+                alert('Ход откачён!');
+            }
         }
 
         function changeTeam() {
@@ -667,6 +798,19 @@
         function randomize() {
             const number = Math.floor(Math.random() * 10) + 1;
             alert(`🎲 Случайное число: ${number}`);
+        }
+
+        function loadNotes() {
+            const savedNotes = localStorage.getItem('notes');
+            if (savedNotes !== null) {
+                document.getElementById('notes-text').value = savedNotes;
+            }
+        }
+
+        function saveNotes() {
+            const notes = document.getElementById('notes-text').value;
+            localStorage.setItem('notes', notes);
+            alert('Заметки сохранены');
         }
 
         function handleGridClick(e) {
@@ -687,10 +831,15 @@
                 }
                 return;
             }
-            if (target.classList.contains('ability-btn')) {
-                const abilityIdx = parseInt(target.dataset.abilityIndex);
-                if (!isNaN(abilityIdx)) {
-                    useAbility(character, abilityIdx);
+
+            const abilityWrapper = target.closest('.ability-wrapper');
+            if (abilityWrapper) {
+                const btn = abilityWrapper.querySelector('.ability-btn');
+                if (btn && !btn.disabled) {
+                    const abilityIdx = parseInt(btn.dataset.abilityIndex);
+                    if (!isNaN(abilityIdx)) {
+                        useAbility(character, abilityIdx);
+                    }
                 }
                 return;
             }
@@ -710,6 +859,8 @@
             document.getElementById('kill-btn')?.addEventListener('click', killEnemy);
             document.getElementById('move-global-btn')?.addEventListener('click', globalMove);
             document.getElementById('change-team-btn')?.addEventListener('click', changeTeam);
+            document.getElementById('save-notes-btn')?.addEventListener('click', saveNotes);
+            loadNotes();
         }
 
         if (document.readyState === 'loading') {
