@@ -500,7 +500,7 @@
             const team2Ids = localStorage.getItem('team2');
             if (!team1Ids || !team2Ids) {
                 alert('Не выбраны команды!');
-                window.location.href = 'team1.html';
+                window.location.href = 'index.html';
                 return false;
             }
             const ids1 = JSON.parse(team1Ids);
@@ -829,7 +829,7 @@
 
         function changeTeam() {
             localStorage.clear();
-            window.location.href = 'team1.html';
+            window.location.href = 'index.html';
         }
 
         function loadNotes() {
