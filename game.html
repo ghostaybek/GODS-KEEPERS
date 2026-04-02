@@ -12,13 +12,13 @@
             color: #eee;
             margin: 0;
             padding: 12px;
-            padding-top: 0;
         }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header {
+
+        .team-menu {
             background: #1e3a4a;
             border-radius: 20px;
-            padding: 10px 12px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -26,6 +26,9 @@
             gap: 8px;
             margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        .team-menu.sticky {
             position: sticky;
             top: 0;
             z-index: 100;
@@ -38,7 +41,7 @@
             border-radius: 40px;
             color: #ffd966;
         }
-        .actions {
+        .team-actions {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -61,12 +64,6 @@
             font-size: 0.85rem;
             background: #f0f0f0;
         }
-        .move-global button {
-            background: #6a4e3a;
-            margin: 0;
-            padding: 4px 10px;
-            font-size: 0.8rem;
-        }
         button {
             background: #3a6b5b;
             color: white;
@@ -86,15 +83,11 @@
             cursor: not-allowed;
         }
         .back-btn { background: #b85c1a; }
-        .back-btn:hover { background: #d46b1e; }
         .end-turn-btn { background: #2c6e9e; }
-        .end-turn-btn:hover { background: #3580b8; }
         .kill-btn { background: #a12f2f; }
-        .kill-btn:hover { background: #c23b3b; }
         .undo-turn-btn { background: #ffaa44; color: #1e2a36; }
-        .undo-turn-btn:hover { background: #ffcc66; }
         .change-team-btn { background: #6a4e3a; }
-        .change-team-btn:hover { background: #7e5d46; }
+
         .team-section {
             margin-bottom: 24px;
         }
@@ -106,6 +99,7 @@
         }
         .team-title.team1 { border-color: #3a86ff; }
         .team-title.team2 { border-color: #e63946; }
+
         .characters-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -237,11 +231,6 @@
             resize: vertical;
             font-family: inherit;
         }
-        .notes-section button {
-            margin: 0;
-            background: #6a4e3a;
-            padding: 8px 16px;
-        }
         .footer {
             text-align: left;
             background: #1f3a46;
@@ -253,7 +242,7 @@
         }
         @media (max-width: 600px) {
             body { padding: 8px; }
-            .header { padding: 8px 10px; gap: 6px; }
+            .team-menu { padding: 6px 10px; gap: 6px; }
             .mana-display { font-size: 1.1rem; padding: 3px 8px; }
             button { padding: 5px 10px; font-size: 0.75rem; }
             .move-global input { width: 65px; font-size: 0.75rem; }
@@ -261,7 +250,6 @@
             .hp-value { font-size: 1.1rem; }
             .ability-btn { font-size: 0.75rem; padding: 6px 10px; }
             .ability-desc { font-size: 0.6rem; }
-            .footer { font-size: 0.65rem; }
         }
         .error-message {
             background: #a12f2f;
@@ -275,26 +263,45 @@
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <div class="mana-display">🌀 Мана: <span id="mana-value">0</span></div>
-        <div class="actions">
+    <!-- Меню для команды 1 (синих) -->
+    <div id="menu-team1" class="team-menu">
+        <div class="mana-display">🔵 Команда 1 - Мана: <span id="mana-value1">0</span></div>
+        <div class="team-actions">
             <div class="move-global">
-                <input type="number" id="move-cost" placeholder="трата маны" value="1" step="1">
-                <button id="move-global-btn">🚶 Движ</button>
+                <input type="number" id="move-cost1" placeholder="трата маны" value="1" step="1">
+                <button id="move-global-btn1">🚶 Движ</button>
             </div>
-            <button id="undo-btn" class="back-btn">↩️ Назад</button>
-            <button id="undo-turn-btn" class="undo-turn-btn">⏪ Вернуть ход</button>
-            <button id="end-turn-btn" class="end-turn-btn">✨ Завершить ход</button>
-            <button id="kill-btn" class="kill-btn">💀 Убил врага</button>
-            <button id="change-team-btn" class="change-team-btn">🔄 Сменить команды</button>
+            <button id="undo-btn1" class="back-btn">↩️ Назад</button>
+            <button id="undo-turn-btn1" class="undo-turn-btn">⏪ Вернуть ход</button>
+            <button id="end-turn-btn1" class="end-turn-btn">✨ Завершить ход</button>
+            <button id="kill-btn1" class="kill-btn">💀 Убил врага</button>
+            <button id="change-team-btn1" class="change-team-btn">🔄 Сменить команды</button>
         </div>
     </div>
 
+    <!-- Команда 1 (синие) -->
     <div class="team-section">
         <div class="team-title team1">Команда 1 (синие)</div>
         <div id="team1-grid" class="characters-grid"></div>
     </div>
 
+    <!-- Меню для команды 2 (красных) -->
+    <div id="menu-team2" class="team-menu">
+        <div class="mana-display">🔴 Команда 2 - Мана: <span id="mana-value2">0</span></div>
+        <div class="team-actions">
+            <div class="move-global">
+                <input type="number" id="move-cost2" placeholder="трата маны" value="1" step="1">
+                <button id="move-global-btn2">🚶 Движ</button>
+            </div>
+            <button id="undo-btn2" class="back-btn">↩️ Назад</button>
+            <button id="undo-turn-btn2" class="undo-turn-btn">⏪ Вернуть ход</button>
+            <button id="end-turn-btn2" class="end-turn-btn">✨ Завершить ход</button>
+            <button id="kill-btn2" class="kill-btn">💀 Убил врага</button>
+            <button id="change-team-btn2" class="change-team-btn">🔄 Сменить команды</button>
+        </div>
+    </div>
+
+    <!-- Команда 2 (красные) -->
     <div class="team-section">
         <div class="team-title team2">Команда 2 (красные)</div>
         <div id="team2-grid" class="characters-grid"></div>
@@ -330,7 +337,7 @@
             ] },
             { id: 3, name: "Портал", hp: 15, abilities: [
                 { name: "Пистолет-резак", mana: 4, type: "normal", description: "наносит 2 урона в сумме 4 клеток (может стрелять сквозь стены)." },
-                { name: "В - Смена цели", mana: 3, type: "normal", description: "отражает действие оппонента, наносящее урон, обратно в него (используется в ход оппонента)." },
+                { name: "В - Смена цели", mana: 3, type: "venom", description: "отражает действие оппонента, наносящее урон, обратно в него (используется в ход оппонента)." },
                 { name: "У - Телепорт", mana: 6, type: "unique", description: "создаёт 2 портала в 2 любых точках карты (бесплатно может убрать их в свой ход)." }
             ] },
             { id: 4, name: "Иллюжн", hp: 15, abilities: [
@@ -422,7 +429,8 @@
         let team1Chars = [];
         let team2Chars = [];
         let allCharacters = [];
-        let currentMana = 15;
+        let currentMana1 = 15;
+        let currentMana2 = 15;
         let charactersHP = {};
         let actionHistory = [];
         let usedUniqueAbilities = {};
@@ -439,51 +447,94 @@
         }
         function clampMana(v) { return Math.min(15, Math.max(0, v)); }
 
-        function hasSkeleton() { return allCharacters.some(c => c.id === skeletonData.id); }
-        function addSkeleton() {
-            if (hasSkeleton()) return false;
-            allCharacters.push(JSON.parse(JSON.stringify(skeletonData)));
-            charactersHP[skeletonData.id] = skeletonData.hp;
+        function hasSummonInTeam(team, summonId) {
+            if (team === 1) return team1Chars.some(c => c.id === summonId);
+            else return team2Chars.some(c => c.id === summonId);
+        }
+
+        function addSummonToTeam(team, data) {
+            const summon = JSON.parse(JSON.stringify(data));
+            if (team === 1) {
+                if (hasSummonInTeam(1, summon.id)) return false;
+                team1Chars.push(summon);
+            } else {
+                if (hasSummonInTeam(2, summon.id)) return false;
+                team2Chars.push(summon);
+            }
+            allCharacters.push(summon);
+            charactersHP[summon.id] = summon.hp;
             return true;
         }
-        function removeSkeleton() {
-            const idx = allCharacters.findIndex(c => c.id === skeletonData.id);
-            if (idx !== -1) { allCharacters.splice(idx, 1); delete charactersHP[skeletonData.id]; return true; }
-            return false;
-        }
-        function hasSnake() { return allCharacters.some(c => c.id === snakeData.id); }
-        function addSnake() {
-            if (hasSnake()) return false;
-            allCharacters.push(JSON.parse(JSON.stringify(snakeData)));
-            charactersHP[snakeData.id] = snakeData.hp;
-            return true;
-        }
-        function removeSnake() {
-            const idx = allCharacters.findIndex(c => c.id === snakeData.id);
-            if (idx !== -1) { allCharacters.splice(idx, 1); delete charactersHP[snakeData.id]; return true; }
-            return false;
-        }
-        function removeCharacterById(charId) {
-            const idx = allCharacters.findIndex(c => c.id === charId);
+
+        function removeSummonFromTeam(team, summonId) {
+            let idx = -1;
+            if (team === 1) idx = team1Chars.findIndex(c => c.id === summonId);
+            else idx = team2Chars.findIndex(c => c.id === summonId);
             if (idx !== -1) {
-                const removed = allCharacters[idx];
-                allCharacters.splice(idx, 1);
-                delete charactersHP[charId];
+                const removed = (team === 1) ? team1Chars[idx] : team2Chars[idx];
+                if (team === 1) team1Chars.splice(idx, 1);
+                else team2Chars.splice(idx, 1);
+                const allIdx = allCharacters.findIndex(c => c.id === summonId);
+                if (allIdx !== -1) allCharacters.splice(allIdx, 1);
+                delete charactersHP[summonId];
                 return removed;
             }
             return null;
         }
-        function restoreCharacter(character, hpValue) {
-            if (!allCharacters.some(c => c.id === character.id)) {
-                allCharacters.push(JSON.parse(JSON.stringify(character)));
-                charactersHP[character.id] = hpValue;
-                return true;
+
+        function removeCharacterById(charId, team = null) {
+            let idx = team1Chars.findIndex(c => c.id === charId);
+            if (idx !== -1) {
+                const removed = team1Chars[idx];
+                team1Chars.splice(idx, 1);
+                const allIdx = allCharacters.findIndex(c => c.id === charId);
+                if (allIdx !== -1) allCharacters.splice(allIdx, 1);
+                delete charactersHP[charId];
+                return { removed, team: 1 };
+            }
+            idx = team2Chars.findIndex(c => c.id === charId);
+            if (idx !== -1) {
+                const removed = team2Chars[idx];
+                team2Chars.splice(idx, 1);
+                const allIdx = allCharacters.findIndex(c => c.id === charId);
+                if (allIdx !== -1) allCharacters.splice(allIdx, 1);
+                delete charactersHP[charId];
+                return { removed, team: 2 };
+            }
+            return null;
+        }
+
+        function restoreCharacter(character, hpValue, team) {
+            if (team === 1) {
+                if (!team1Chars.some(c => c.id === character.id)) {
+                    team1Chars.push(JSON.parse(JSON.stringify(character)));
+                    allCharacters.push(JSON.parse(JSON.stringify(character)));
+                    charactersHP[character.id] = hpValue;
+                    return true;
+                }
+            } else if (team === 2) {
+                if (!team2Chars.some(c => c.id === character.id)) {
+                    team2Chars.push(JSON.parse(JSON.stringify(character)));
+                    allCharacters.push(JSON.parse(JSON.stringify(character)));
+                    charactersHP[character.id] = hpValue;
+                    return true;
+                }
             }
             return false;
         }
 
+        // Функция для удаления summon'а при смерти хозяина
+        function removeSummonOnMasterDeath(masterId, masterTeam) {
+            if (masterId === 7) { // Аюно
+                removeSummonFromTeam(masterTeam, skeletonData.id);
+            } else if (masterId === 9) { // Серпенс
+                removeSummonFromTeam(masterTeam, snakeData.id);
+            }
+        }
+
         function persistState() {
-            localStorage.setItem('currentMana', currentMana);
+            localStorage.setItem('currentMana1', currentMana1);
+            localStorage.setItem('currentMana2', currentMana2);
             localStorage.setItem('charactersHP', JSON.stringify(charactersHP));
             localStorage.setItem('actionHistory', JSON.stringify(actionHistory));
             localStorage.setItem('usedUniqueAbilities', JSON.stringify(usedUniqueAbilities));
@@ -513,8 +564,11 @@
                 allCharacters.forEach(ch => { charactersHP[ch.id] = ch.hp; });
             }
 
-            const savedMana = localStorage.getItem('currentMana');
-            currentMana = savedMana !== null ? parseInt(savedMana, 10) : 15;
+            const savedMana1 = localStorage.getItem('currentMana1');
+            currentMana1 = savedMana1 !== null ? parseInt(savedMana1, 10) : 15;
+            const savedMana2 = localStorage.getItem('currentMana2');
+            currentMana2 = savedMana2 !== null ? parseInt(savedMana2, 10) : 15;
+
             const savedHistory = localStorage.getItem('actionHistory');
             if (savedHistory) {
                 try { actionHistory = JSON.parse(savedHistory); } catch(e) { actionHistory = []; }
@@ -534,15 +588,16 @@
             return true;
         }
 
-        function renderTeam(team, containerId, teamClass) {
+        function renderTeam(team, containerId, cardClass) {
             const container = document.getElementById(containerId);
             if (!container) return;
+            const teamChars = (team === 1) ? team1Chars : team2Chars;
             container.innerHTML = '';
-            team.forEach(char => {
+            teamChars.forEach(char => {
                 const currentHp = charactersHP[char.id] !== undefined ? charactersHP[char.id] : char.hp;
                 const colorClass = getNameColorClass(char.name);
                 const card = document.createElement('div');
-                card.className = `character-card ${teamClass}`;
+                card.className = `character-card ${cardClass}`;
                 card.dataset.id = char.id;
                 let abilitiesHtml = '<div class="abilities">';
                 char.abilities.forEach((ab, idx) => {
@@ -573,19 +628,28 @@
         }
 
         function renderAll() {
-            renderTeam(team1Chars, 'team1-grid', 'team1-card');
-            renderTeam(team2Chars, 'team2-grid', 'team2-card');
+            renderTeam(1, 'team1-grid', 'team1-card');
+            renderTeam(2, 'team2-grid', 'team2-card');
             updateUI();
         }
 
         function updateUI() {
-            document.getElementById('mana-value').textContent = currentMana;
-            const moveCost = document.getElementById('move-cost');
-            const moveBtn = document.getElementById('move-global-btn');
-            if (moveCost && moveBtn) {
-                const val = parseInt(moveCost.value, 10);
-                moveBtn.disabled = isNaN(val) || val <= 0 || currentMana < val;
+            document.getElementById('mana-value1').textContent = currentMana1;
+            document.getElementById('mana-value2').textContent = currentMana2;
+
+            const moveCost1 = document.getElementById('move-cost1');
+            const moveBtn1 = document.getElementById('move-global-btn1');
+            if (moveCost1 && moveBtn1) {
+                const val = parseInt(moveCost1.value, 10);
+                moveBtn1.disabled = isNaN(val) || val <= 0 || currentMana1 < val;
             }
+            const moveCost2 = document.getElementById('move-cost2');
+            const moveBtn2 = document.getElementById('move-global-btn2');
+            if (moveCost2 && moveBtn2) {
+                const val = parseInt(moveCost2.value, 10);
+                moveBtn2.disabled = isNaN(val) || val <= 0 || currentMana2 < val;
+            }
+
             document.querySelectorAll('.character-card').forEach(card => {
                 const charId = parseInt(card.dataset.id);
                 const char = allCharacters.find(c => c.id === charId);
@@ -597,13 +661,15 @@
                     let disabled = false;
                     if (ab.type === 'unique') disabled = usedUniqueAbilities[key] === true;
                     if (ab.type === 'venom') disabled = blockedVenomAbilities[key] === true;
-                    if (currentMana < ab.mana) disabled = true;
+                    let mana = currentMana1;
+                    if (team2Chars.some(c => c.id === charId)) mana = currentMana2;
+                    if (mana < ab.mana) disabled = true;
                     btn.disabled = disabled;
                 });
             });
         }
 
-        function handleRandomAbility(ability, character, abilityIdx) {
+        function handleRandomAbility(ability, character, abilityIdx, team) {
             const name = ability.name;
             const match = name.match(/^Р(\d+)?/);
             let count = 1;
@@ -611,18 +677,22 @@
             const numbers = [];
             for (let i = 0; i < count; i++) numbers.push(Math.floor(Math.random() * 10) + 1);
             alert(`🎲 Случайные числа (${count}): ${numbers.join(', ')}`);
-            currentMana = clampMana(currentMana - ability.mana);
+            let mana = (team === 1) ? currentMana1 : currentMana2;
+            mana = clampMana(mana - ability.mana);
+            if (team === 1) currentMana1 = mana;
+            else currentMana2 = mana;
             const key = `${character.id}_${abilityIdx}`;
-            actionHistory.push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana });
+            actionHistory.push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
             if (ability.type === 'unique') usedUniqueAbilities[key] = true;
             else if (ability.type === 'venom') blockedVenomAbilities[key] = true;
             persistState();
             renderAll();
         }
 
-        function useAbility(character, abilityIdx) {
+        function useAbility(character, abilityIdx, team) {
             const ability = character.abilities[abilityIdx];
             const key = `${character.id}_${abilityIdx}`;
+            let mana = (team === 1) ? currentMana1 : currentMana2;
 
             if (ability.type === 'unique' && usedUniqueAbilities[key]) {
                 alert('Эта способность уже использована один раз за игру!');
@@ -632,17 +702,19 @@
                 alert('Эта способность временно недоступна. Убейте врага, чтобы восстановить её.');
                 return;
             }
-            if (currentMana < ability.mana) {
-                alert(`Не хватает маны! Нужно ${ability.mana}, есть ${currentMana}`);
+            if (mana < ability.mana) {
+                alert(`Не хватает маны! Нужно ${ability.mana}, есть ${mana}`);
                 return;
             }
 
             // Призыв скелета (Аюно id=7)
             if (character.id === 7 && abilityIdx === 1 && ability.name === "В - Призыв скелета") {
-                if (hasSkeleton()) { alert('Скелет уже призван!'); return; }
-                currentMana = clampMana(currentMana - ability.mana);
-                addSkeleton();
-                actionHistory.push({ type: 'summonSkeleton', abilityKey: key, abilityType: ability.type, cost: ability.mana });
+                if (hasSummonInTeam(team, skeletonData.id)) { alert('Скелет уже призван в этой команде!'); return; }
+                mana = clampMana(mana - ability.mana);
+                if (team === 1) currentMana1 = mana;
+                else currentMana2 = mana;
+                addSummonToTeam(team, skeletonData);
+                actionHistory.push({ type: 'summonSkeleton', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
                 if (ability.type === 'venom') blockedVenomAbilities[key] = true;
                 persistState();
                 renderAll();
@@ -651,10 +723,12 @@
 
             // Призыв змеи (Серпенс id=9)
             if (character.id === 9 && abilityIdx === 1 && ability.name === "В - Призыв змеи") {
-                if (hasSnake()) { alert('Змея уже призвана!'); return; }
-                currentMana = clampMana(currentMana - ability.mana);
-                addSnake();
-                actionHistory.push({ type: 'summonSnake', abilityKey: key, abilityType: ability.type, cost: ability.mana });
+                if (hasSummonInTeam(team, snakeData.id)) { alert('Змея уже призвана в этой команде!'); return; }
+                mana = clampMana(mana - ability.mana);
+                if (team === 1) currentMana1 = mana;
+                else currentMana2 = mana;
+                addSummonToTeam(team, snakeData);
+                actionHistory.push({ type: 'summonSnake', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
                 if (ability.type === 'venom') blockedVenomAbilities[key] = true;
                 persistState();
                 renderAll();
@@ -662,59 +736,69 @@
             }
 
             if (ability.type === 'random') {
-                handleRandomAbility(ability, character, abilityIdx);
+                handleRandomAbility(ability, character, abilityIdx, team);
                 return;
             }
 
-            currentMana = clampMana(currentMana - ability.mana);
-            actionHistory.push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana });
+            mana = clampMana(mana - ability.mana);
+            if (team === 1) currentMana1 = mana;
+            else currentMana2 = mana;
+            actionHistory.push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
             if (ability.type === 'unique') usedUniqueAbilities[key] = true;
             else if (ability.type === 'venom') blockedVenomAbilities[key] = true;
             persistState();
             renderAll();
         }
 
-        function changeHP(character, delta) {
+        function changeHP(character, delta, team) {
             if (delta === 0) return;
             let newHp = charactersHP[character.id] + delta;
             const wasAlive = charactersHP[character.id] > 0;
             newHp = clampHp(newHp, character.id, character.name);
             if (newHp <= 0 && wasAlive) {
                 if (!confirm(`${character.name} получает ${-delta} урона и погибает! Продолжить?`)) return;
-                const removedChar = removeCharacterById(character.id);
-                if (removedChar) {
-                    actionHistory.push({ type: 'death', charId: character.id, removedChar: removedChar, previousHp: charactersHP[character.id] });
+                // Удаляем summon'а, если умирает Аюно или Серпенс
+                removeSummonOnMasterDeath(character.id, team);
+                const removedInfo = removeCharacterById(character.id);
+                if (removedInfo) {
+                    actionHistory.push({ type: 'death', charId: character.id, removedChar: removedInfo.removed, previousHp: charactersHP[character.id], team: team });
                     delete charactersHP[character.id];
                 }
             } else {
                 charactersHP[character.id] = newHp;
-                actionHistory.push({ type: 'hpChange', charId: character.id, delta: delta });
+                actionHistory.push({ type: 'hpChange', charId: character.id, delta: delta, team: team });
             }
             persistState();
             renderAll();
         }
 
-        function globalMove() {
-            const costInput = document.getElementById('move-cost');
+        function globalMove(team) {
+            const costInput = document.getElementById(`move-cost${team}`);
             let cost = parseInt(costInput.value, 10);
             if (isNaN(cost) || cost <= 0) { alert('Введите положительное число маны'); return; }
-            if (currentMana >= cost) {
-                currentMana = clampMana(currentMana - cost);
-                actionHistory.push({ type: 'move', cost: cost });
+            let mana = (team === 1) ? currentMana1 : currentMana2;
+            if (mana >= cost) {
+                mana = clampMana(mana - cost);
+                if (team === 1) currentMana1 = mana;
+                else currentMana2 = mana;
+                actionHistory.push({ type: 'move', cost: cost, team: team });
                 persistState();
                 renderAll();
                 costInput.value = 1;
             } else {
-                alert(`Не хватает маны! Нужно ${cost}, есть ${currentMana}`);
+                alert(`Не хватает маны! Нужно ${cost}, есть ${mana}`);
             }
         }
 
-        function killEnemy() {
+        function killEnemy(team) {
             blockedVenomAbilities = {};
-            currentMana = clampMana(currentMana + 3);
+            let mana = (team === 1) ? currentMana1 : currentMana2;
+            mana = clampMana(mana + 3);
+            if (team === 1) currentMana1 = mana;
+            else currentMana2 = mana;
             persistState();
             renderAll();
-            alert('Враг повержен! +3 маны. Способности с префиксом "В" снова доступны.');
+            alert(`Враг повержен! +3 маны команде ${team}. Способности с префиксом "В" снова доступны.`);
         }
 
         function undo() {
@@ -722,28 +806,48 @@
             const last = actionHistory.pop();
             switch (last.type) {
                 case 'ability':
-                    currentMana = clampMana(currentMana + last.cost);
-                    if (last.abilityType === 'unique') delete usedUniqueAbilities[last.abilityKey];
-                    else if (last.abilityType === 'venom') delete blockedVenomAbilities[last.abilityKey];
+                    {
+                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
+                        mana = clampMana(mana + last.cost);
+                        if (last.team === 1) currentMana1 = mana;
+                        else currentMana2 = mana;
+                        if (last.abilityType === 'unique') delete usedUniqueAbilities[last.abilityKey];
+                        else if (last.abilityType === 'venom') delete blockedVenomAbilities[last.abilityKey];
+                    }
                     break;
                 case 'move':
-                    currentMana = clampMana(currentMana + last.cost);
+                    {
+                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
+                        mana = clampMana(mana + last.cost);
+                        if (last.team === 1) currentMana1 = mana;
+                        else currentMana2 = mana;
+                    }
                     break;
                 case 'hpChange':
                     charactersHP[last.charId] -= last.delta;
                     break;
                 case 'summonSkeleton':
-                    currentMana = clampMana(currentMana + last.cost);
-                    removeSkeleton();
-                    if (last.abilityType === 'venom') delete blockedVenomAbilities[last.abilityKey];
+                    {
+                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
+                        mana = clampMana(mana + last.cost);
+                        if (last.team === 1) currentMana1 = mana;
+                        else currentMana2 = mana;
+                        removeSummonFromTeam(last.team, skeletonData.id);
+                        if (last.abilityType === 'venom') delete blockedVenomAbilities[last.abilityKey];
+                    }
                     break;
                 case 'summonSnake':
-                    currentMana = clampMana(currentMana + last.cost);
-                    removeSnake();
-                    if (last.abilityType === 'venom') delete blockedVenomAbilities[last.abilityKey];
+                    {
+                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
+                        mana = clampMana(mana + last.cost);
+                        if (last.team === 1) currentMana1 = mana;
+                        else currentMana2 = mana;
+                        removeSummonFromTeam(last.team, snakeData.id);
+                        if (last.abilityType === 'venom') delete blockedVenomAbilities[last.abilityKey];
+                    }
                     break;
                 case 'death':
-                    restoreCharacter(last.removedChar, last.previousHp);
+                    restoreCharacter(last.removedChar, last.previousHp, last.team);
                     charactersHP[last.charId] = last.previousHp;
                     break;
             }
@@ -753,11 +857,13 @@
 
         function pushTurnState() {
             turnStates.push({
-                currentMana: currentMana,
+                currentMana1: currentMana1,
+                currentMana2: currentMana2,
                 charactersHP: { ...charactersHP },
                 usedUniqueAbilities: { ...usedUniqueAbilities },
                 blockedVenomAbilities: { ...blockedVenomAbilities },
-                allCharacters: JSON.parse(JSON.stringify(allCharacters))
+                team1Chars: JSON.parse(JSON.stringify(team1Chars)),
+                team2Chars: JSON.parse(JSON.stringify(team2Chars))
             });
             if (turnStates.length > 20) turnStates.shift();
             persistState();
@@ -766,13 +872,14 @@
         function undoLastTurn() {
             if (turnStates.length === 0) { alert('Нет сохранённых ходов'); return; }
             const lastState = turnStates.pop();
-            currentMana = lastState.currentMana;
+            currentMana1 = lastState.currentMana1;
+            currentMana2 = lastState.currentMana2;
             charactersHP = { ...lastState.charactersHP };
             usedUniqueAbilities = { ...lastState.usedUniqueAbilities };
             blockedVenomAbilities = { ...lastState.blockedVenomAbilities };
-            allCharacters = JSON.parse(JSON.stringify(lastState.allCharacters));
-            team1Chars = allCharacters.filter(c => team1Chars.some(t => t.id === c.id));
-            team2Chars = allCharacters.filter(c => team2Chars.some(t => t.id === c.id));
+            team1Chars = JSON.parse(JSON.stringify(lastState.team1Chars));
+            team2Chars = JSON.parse(JSON.stringify(lastState.team2Chars));
+            allCharacters = [...team1Chars, ...team2Chars];
             actionHistory = [];
             persistState();
             renderAll();
@@ -781,7 +888,8 @@
 
         function endTurn() {
             pushTurnState();
-            currentMana = clampMana(currentMana + 5);
+            currentMana1 = clampMana(currentMana1 + 5);
+            currentMana2 = clampMana(currentMana2 + 5);
             actionHistory = [];
             persistState();
             renderAll();
@@ -803,7 +911,7 @@
             alert('Заметки сохранены');
         }
 
-        function handleGridClick(e) {
+        function handleGridClick(e, team) {
             const target = e.target;
             const card = target.closest('.character-card');
             if (!card) return;
@@ -816,7 +924,7 @@
                 let delta = parseInt(input.value, 10);
                 if (isNaN(delta)) delta = 0;
                 if (delta !== 0) {
-                    changeHP(character, delta);
+                    changeHP(character, delta, team);
                     input.value = 0;
                 }
                 return;
@@ -826,24 +934,54 @@
                 const btn = wrapper.querySelector('.ability-btn');
                 if (btn && !btn.disabled) {
                     const idx = parseInt(btn.dataset.abilityIndex);
-                    if (!isNaN(idx)) useAbility(character, idx);
+                    if (!isNaN(idx)) useAbility(character, idx, team);
                 }
                 return;
             }
         }
 
+        function initStickyMenus() {
+            const menu1 = document.getElementById('menu-team1');
+            const menu2 = document.getElementById('menu-team2');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.target === menu2) {
+                        if (entry.isIntersecting) {
+                            menu1.classList.remove('sticky');
+                            menu2.classList.add('sticky');
+                        } else {
+                            menu2.classList.remove('sticky');
+                            menu1.classList.add('sticky');
+                        }
+                    }
+                });
+            }, { threshold: 0, rootMargin: '0px 0px -100% 0px' });
+            observer.observe(menu2);
+            menu1.classList.add('sticky');
+        }
+
         function init() {
             if (!loadGameState()) return;
             renderAll();
-            document.getElementById('undo-btn')?.addEventListener('click', undo);
-            document.getElementById('undo-turn-btn')?.addEventListener('click', undoLastTurn);
-            document.getElementById('end-turn-btn')?.addEventListener('click', endTurn);
-            document.getElementById('kill-btn')?.addEventListener('click', killEnemy);
-            document.getElementById('move-global-btn')?.addEventListener('click', globalMove);
-            document.getElementById('change-team-btn')?.addEventListener('click', changeTeam);
-            document.getElementById('save-notes-btn')?.addEventListener('click', saveNotes);
-            document.getElementById('team1-grid')?.addEventListener('click', handleGridClick);
-            document.getElementById('team2-grid')?.addEventListener('click', handleGridClick);
+            initStickyMenus();
+
+            document.getElementById('move-global-btn1').addEventListener('click', () => globalMove(1));
+            document.getElementById('undo-btn1').addEventListener('click', undo);
+            document.getElementById('undo-turn-btn1').addEventListener('click', undoLastTurn);
+            document.getElementById('end-turn-btn1').addEventListener('click', endTurn);
+            document.getElementById('kill-btn1').addEventListener('click', () => killEnemy(1));
+            document.getElementById('change-team-btn1').addEventListener('click', changeTeam);
+            document.getElementById('team1-grid').addEventListener('click', (e) => handleGridClick(e, 1));
+
+            document.getElementById('move-global-btn2').addEventListener('click', () => globalMove(2));
+            document.getElementById('undo-btn2').addEventListener('click', undo);
+            document.getElementById('undo-turn-btn2').addEventListener('click', undoLastTurn);
+            document.getElementById('end-turn-btn2').addEventListener('click', endTurn);
+            document.getElementById('kill-btn2').addEventListener('click', () => killEnemy(2));
+            document.getElementById('change-team-btn2').addEventListener('click', changeTeam);
+            document.getElementById('team2-grid').addEventListener('click', (e) => handleGridClick(e, 2));
+
+            document.getElementById('save-notes-btn').addEventListener('click', saveNotes);
             loadNotes();
         }
 
