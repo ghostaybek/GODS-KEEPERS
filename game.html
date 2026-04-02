@@ -323,7 +323,7 @@
 
 <script>
     (function() {
-        // ----- ОБНОВЛЁННЫЙ СПИСОК ПЕРСОНАЖЕЙ -----
+        // ----- ОБНОВЛЁННЫЙ СПИСОК ПЕРСОНАЖЕЙ (согласно вашему последнему сообщению) -----
         const fullCharacters = [
             { id: 1, name: "Темпос", hp: 15, abilities: [
                 { name: "Самурай", mana: 3, type: "normal", description: "рывок на сумму 2–4 клеток, наносящий всем на своём пути 4 урона." },
@@ -523,11 +523,10 @@
             return false;
         }
 
-        // Функция для удаления summon'а при смерти хозяина
         function removeSummonOnMasterDeath(masterId, masterTeam) {
-            if (masterId === 7) { // Аюно
+            if (masterId === 7) {
                 removeSummonFromTeam(masterTeam, skeletonData.id);
-            } else if (masterId === 9) { // Серпенс
+            } else if (masterId === 9) {
                 removeSummonFromTeam(masterTeam, snakeData.id);
             }
         }
@@ -757,7 +756,6 @@
             newHp = clampHp(newHp, character.id, character.name);
             if (newHp <= 0 && wasAlive) {
                 if (!confirm(`${character.name} получает ${-delta} урона и погибает! Продолжить?`)) return;
-                // Удаляем summon'а, если умирает Аюно или Серпенс
                 removeSummonOnMasterDeath(character.id, team);
                 const removedInfo = removeCharacterById(character.id);
                 if (removedInfo) {
@@ -869,27 +867,13 @@
             persistState();
         }
 
-        function undoLastTurn() {
-            if (turnStates.length === 0) { alert('Нет сохранённых ходов'); return; }
-            const lastState = turnStates.pop();
-            currentMana1 = lastState.currentMana1;
-            currentMana2 = lastState.currentMana2;
-            charactersHP = { ...lastState.charactersHP };
-            usedUniqueAbilities = { ...lastState.usedUniqueAbilities };
-            blockedVenomAbilities = { ...lastState.blockedVenomAbilities };
-            team1Chars = JSON.parse(JSON.stringify(lastState.team1Chars));
-            team2Chars = JSON.parse(JSON.stringify(lastState.team2Chars));
-            allCharacters = [...team1Chars, ...team2Chars];
-            actionHistory = [];
-            persistState();
-            renderAll();
-            alert('Ход откачён!');
-        }
-
-        function endTurn() {
+        function endTurn(team) {
             pushTurnState();
-            currentMana1 = clampMana(currentMana1 + 5);
-            currentMana2 = clampMana(currentMana2 + 5);
+            if (team === 1) {
+                currentMana1 = clampMana(currentMana1 + 5);
+            } else {
+                currentMana2 = clampMana(currentMana2 + 5);
+            }
             actionHistory = [];
             persistState();
             renderAll();
@@ -968,7 +952,7 @@
             document.getElementById('move-global-btn1').addEventListener('click', () => globalMove(1));
             document.getElementById('undo-btn1').addEventListener('click', undo);
             document.getElementById('undo-turn-btn1').addEventListener('click', undoLastTurn);
-            document.getElementById('end-turn-btn1').addEventListener('click', endTurn);
+            document.getElementById('end-turn-btn1').addEventListener('click', () => endTurn(1));
             document.getElementById('kill-btn1').addEventListener('click', () => killEnemy(1));
             document.getElementById('change-team-btn1').addEventListener('click', changeTeam);
             document.getElementById('team1-grid').addEventListener('click', (e) => handleGridClick(e, 1));
@@ -976,13 +960,30 @@
             document.getElementById('move-global-btn2').addEventListener('click', () => globalMove(2));
             document.getElementById('undo-btn2').addEventListener('click', undo);
             document.getElementById('undo-turn-btn2').addEventListener('click', undoLastTurn);
-            document.getElementById('end-turn-btn2').addEventListener('click', endTurn);
+            document.getElementById('end-turn-btn2').addEventListener('click', () => endTurn(2));
             document.getElementById('kill-btn2').addEventListener('click', () => killEnemy(2));
             document.getElementById('change-team-btn2').addEventListener('click', changeTeam);
             document.getElementById('team2-grid').addEventListener('click', (e) => handleGridClick(e, 2));
 
             document.getElementById('save-notes-btn').addEventListener('click', saveNotes);
             loadNotes();
+        }
+
+        function undoLastTurn() {
+            if (turnStates.length === 0) { alert('Нет сохранённых ходов'); return; }
+            const lastState = turnStates.pop();
+            currentMana1 = lastState.currentMana1;
+            currentMana2 = lastState.currentMana2;
+            charactersHP = { ...lastState.charactersHP };
+            usedUniqueAbilities = { ...lastState.usedUniqueAbilities };
+            blockedVenomAbilities = { ...lastState.blockedVenomAbilities };
+            team1Chars = JSON.parse(JSON.stringify(lastState.team1Chars));
+            team2Chars = JSON.parse(JSON.stringify(lastState.team2Chars));
+            allCharacters = [...team1Chars, ...team2Chars];
+            actionHistory = [];
+            persistState();
+            renderAll();
+            alert('Ход откачён!');
         }
 
         init();
