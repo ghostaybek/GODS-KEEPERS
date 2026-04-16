@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Битва хранителей</title>
+    <title>Битва хранителей 4x4</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
@@ -15,7 +15,8 @@
         }
         .container { max-width: 1400px; margin: 0 auto; }
 
-        .team-menu {
+        /* Основные панели команд */
+        .team-header {
             background: #1e3a4a;
             border-radius: 20px;
             padding: 8px 12px;
@@ -26,50 +27,82 @@
             gap: 8px;
             margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-        }
-        .team-menu.sticky {
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        .mana-display {
+        .team-header .team-title {
             font-size: 1.3rem;
             font-weight: bold;
-            background: #00000066;
-            padding: 4px 12px;
-            border-radius: 40px;
             color: #ffd966;
         }
-        .team-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
+        .team-header .global-change-btn {
+            background: #6a4e3a;
+            padding: 6px 12px;
+            font-size: 0.8rem;
         }
-        .move-global {
+
+        /* Контейнер для двух панелей пары */
+        .pairs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .pair-panel {
+            flex: 1;
+            min-width: 200px;
+            background: #1e2f3a;
+            border-radius: 20px;
+            padding: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .pair-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-left: 8px;
+            border-left: 3px solid;
+        }
+        .pair-title.blue { border-color: #3a86ff; }
+        .pair-title.red { border-color: #e63946; }
+        .pair-mana {
+            font-size: 1rem;
+            background: #00000066;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .pair-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .pair-actions .move-global {
             background: #2a3f4a;
             border-radius: 20px;
-            padding: 4px 10px;
+            padding: 2px 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-        .move-global input {
-            width: 80px;
-            padding: 6px;
+        .pair-actions .move-global input {
+            width: 60px;
+            padding: 4px;
             border-radius: 30px;
             border: none;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             background: #f0f0f0;
         }
         button {
             background: #3a6b5b;
             color: white;
             border: none;
-            padding: 6px 12px;
-            font-size: 0.8rem;
+            padding: 4px 10px;
+            font-size: 0.75rem;
             border-radius: 40px;
             cursor: pointer;
             font-weight: bold;
@@ -86,50 +119,25 @@
         .end-turn-btn { background: #2c6e9e; }
         .kill-btn { background: #a12f2f; }
         .undo-turn-btn { background: #ffaa44; color: #1e2a36; }
-        .change-team-btn { background: #6a4e3a; }
 
-        .team-section {
-            margin-bottom: 24px;
-        }
-        .team-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            padding-left: 8px;
-            border-left: 4px solid;
-        }
-        .team-title.team1 { border-color: #3a86ff; }
-        .team-title.team2 { border-color: #e63946; }
-
+        /* Сетка карточек персонажей */
         .characters-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        @media (max-width: 1000px) {
-            .characters-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 600px) {
-            .characters-grid { grid-template-columns: 1fr; }
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
         }
         .character-card {
-            background: #1e2f3a;
-            border-radius: 20px;
-            padding: 12px;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-        .character-card.team1-card {
-            box-shadow: 0 0 0 2px #3a86ff, 0 6px 14px rgba(0,0,0,0.3);
-        }
-        .character-card.team2-card {
-            box-shadow: 0 0 0 2px #e63946, 0 6px 14px rgba(0,0,0,0.3);
+            background: #2c4050;
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         .character-name {
-            font-size: 1.3rem;
+            font-size: 1rem;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .name-cyan { color: #00ffff; }
         .name-pink { color: #ff69b4; }
@@ -141,75 +149,58 @@
 
         .hp-section {
             background: #2a3f4a;
-            border-radius: 16px;
-            padding: 8px;
-            margin-bottom: 12px;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
+            font-size: 0.8rem;
         }
         .hp-value {
-            font-size: 1.3rem;
             font-weight: bold;
             color: #ff7777;
         }
         .hp-control {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
         }
         .hp-control input {
-            width: 70px;
-            padding: 6px;
-            border-radius: 30px;
+            width: 50px;
+            padding: 4px;
+            border-radius: 20px;
             border: none;
             text-align: center;
-            font-size: 0.8rem;
-            background: #f0f0f0;
+            font-size: 0.7rem;
         }
         .abilities {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .ability-wrapper {
             background: #2a3f4a;
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
-        }
-        .ability-wrapper:hover {
-            background: #3f5e6b;
         }
         .ability-btn {
             background: #3f5e6b;
             width: 100%;
             text-align: left;
-            padding: 8px 12px;
+            padding: 6px 8px;
             display: flex;
             justify-content: space-between;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             border-radius: 0;
-            cursor: pointer;
-        }
-        .ability-btn:disabled {
-            background: #2c4a3e;
-            cursor: not-allowed;
-        }
-        .ability-name { font-weight: bold; }
-        .ability-cost {
-            background: #00000055;
-            padding: 2px 8px;
-            border-radius: 20px;
         }
         .ability-desc {
-            font-size: 0.65rem;
-            padding: 6px 10px;
+            font-size: 0.6rem;
+            padding: 4px 8px;
             background: #1e2f3a;
             color: #ccc;
-            line-height: 1.3;
         }
         .notes-section {
             margin-top: 24px;
@@ -219,7 +210,6 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            align-items: flex-start;
         }
         .notes-section textarea {
             flex: 1;
@@ -227,104 +217,121 @@
             color: white;
             border: 1px solid #4a6a7a;
             border-radius: 14px;
-            padding: 10px;
-            font-size: 0.8rem;
-            resize: vertical;
-            font-family: inherit;
+            padding: 8px;
+            font-size: 0.75rem;
         }
         .footer {
-            text-align: left;
             background: #1f3a46;
             border-radius: 14px;
-            padding: 12px;
-            margin-top: 24px;
-            font-size: 0.7rem;
-            color: #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 0.65rem;
         }
-        @media (max-width: 600px) {
-            body { padding: 8px; }
-            .team-menu { padding: 6px 10px; gap: 6px; }
-            .mana-display { font-size: 1.1rem; padding: 3px 8px; }
-            button { padding: 5px 10px; font-size: 0.75rem; }
-            .move-global input { width: 65px; font-size: 0.75rem; }
-            .character-name { font-size: 1.1rem; }
-            .hp-value { font-size: 1.1rem; }
-            .ability-btn { font-size: 0.75rem; padding: 6px 10px; }
-            .ability-desc { font-size: 0.6rem; }
-        }
-        .error-message {
-            background: #a12f2f;
-            color: white;
-            padding: 15px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 20px;
+        @media (max-width: 700px) {
+            .pairs-container { flex-direction: column; }
+            .characters-grid { grid-template-columns: 1fr; }
+            button { padding: 3px 8px; font-size: 0.7rem; }
+            .pair-actions .move-global input { width: 50px; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Меню для команды 1 (синих) -->
-    <div id="menu-team1" class="team-menu">
-        <div class="mana-display">🔵 Команда 1 - Мана: <span id="mana-value1">0</span></div>
-        <div class="team-actions">
-            <div class="move-global">
-                <input type="number" id="move-cost1" placeholder="трата маны" value="1" step="1">
-                <button id="move-global-btn1">🚶 Движ</button>
+    <!-- Панель команды Синих (общая, с кнопкой смены команд) -->
+    <div class="team-header">
+        <div class="team-title">🔵 Команда Синих</div>
+        <button id="global-change-team" class="global-change-btn">🔄 Сменить команды</button>
+    </div>
+
+    <!-- Пары команды Синих: Пара 1 и Пара 2 -->
+    <div class="pairs-container">
+        <div class="pair-panel" id="pair1-panel">
+            <div class="pair-title blue">Пара 1</div>
+            <div class="pair-mana">🌀 Мана: <span id="mana-pair1">0</span></div>
+            <div class="pair-actions">
+                <div class="move-global">
+                    <input type="number" id="move-cost-pair1" value="1" step="1">
+                    <button id="move-btn-pair1">🚶 Движ</button>
+                </div>
+                <button id="undo-btn-pair1" class="back-btn">↩️ Назад</button>
+                <button id="undo-turn-btn-pair1" class="undo-turn-btn">⏪ Вернуть ход</button>
+                <button id="end-turn-btn-pair1" class="end-turn-btn">✨ Завершить ход</button>
+                <button id="kill-btn-pair1" class="kill-btn">💀 Убил Хранителя</button>
             </div>
-            <button id="undo-btn1" class="back-btn">↩️ Назад</button>
-            <button id="undo-turn-btn1" class="undo-turn-btn">⏪ Вернуть ход</button>
-            <button id="end-turn-btn1" class="end-turn-btn">✨ Завершить ход</button>
-            <button id="kill-btn1" class="kill-btn">💀 Убил Хранителя</button>
-            <button id="change-team-btn1" class="change-team-btn">🔄 Сменить команды</button>
+            <div id="pair1-grid" class="characters-grid"></div>
+        </div>
+        <div class="pair-panel" id="pair2-panel">
+            <div class="pair-title blue">Пара 2</div>
+            <div class="pair-mana">🌀 Мана: <span id="mana-pair2">0</span></div>
+            <div class="pair-actions">
+                <div class="move-global">
+                    <input type="number" id="move-cost-pair2" value="1" step="1">
+                    <button id="move-btn-pair2">🚶 Движ</button>
+                </div>
+                <button id="undo-btn-pair2" class="back-btn">↩️ Назад</button>
+                <button id="undo-turn-btn-pair2" class="undo-turn-btn">⏪ Вернуть ход</button>
+                <button id="end-turn-btn-pair2" class="end-turn-btn">✨ Завершить ход</button>
+                <button id="kill-btn-pair2" class="kill-btn">💀 Убил Хранителя</button>
+            </div>
+            <div id="pair2-grid" class="characters-grid"></div>
         </div>
     </div>
 
-    <!-- Команда 1 (синие) -->
-    <div class="team-section">
-        <div class="team-title team1">Команда 1 (синие)</div>
-        <div id="team1-grid" class="characters-grid"></div>
+    <!-- Панель команды Красных (только заголовок) -->
+    <div class="team-header" style="background: #2a1e2a;">
+        <div class="team-title">🔴 Команда Красных</div>
     </div>
 
-    <!-- Меню для команды 2 (красных) -->
-    <div id="menu-team2" class="team-menu">
-        <div class="mana-display">🔴 Команда 2 - Мана: <span id="mana-value2">0</span></div>
-        <div class="team-actions">
-            <div class="move-global">
-                <input type="number" id="move-cost2" placeholder="трата маны" value="1" step="1">
-                <button id="move-global-btn2">🚶 Движ</button>
+    <!-- Пары команды Красных: Пара A и Пара B -->
+    <div class="pairs-container">
+        <div class="pair-panel" id="pairA-panel">
+            <div class="pair-title red">Пара A</div>
+            <div class="pair-mana">🌀 Мана: <span id="mana-pairA">0</span></div>
+            <div class="pair-actions">
+                <div class="move-global">
+                    <input type="number" id="move-cost-pairA" value="1" step="1">
+                    <button id="move-btn-pairA">🚶 Движ</button>
+                </div>
+                <button id="undo-btn-pairA" class="back-btn">↩️ Назад</button>
+                <button id="undo-turn-btn-pairA" class="undo-turn-btn">⏪ Вернуть ход</button>
+                <button id="end-turn-btn-pairA" class="end-turn-btn">✨ Завершить ход</button>
+                <button id="kill-btn-pairA" class="kill-btn">💀 Убил Хранителя</button>
             </div>
-            <button id="undo-btn2" class="back-btn">↩️ Назад</button>
-            <button id="undo-turn-btn2" class="undo-turn-btn">⏪ Вернуть ход</button>
-            <button id="end-turn-btn2" class="end-turn-btn">✨ Завершить ход</button>
-            <button id="kill-btn2" class="kill-btn">💀 Убил Хранителя</button>
-            <button id="change-team-btn2" class="change-team-btn">🔄 Сменить команды</button>
+            <div id="pairA-grid" class="characters-grid"></div>
         </div>
-    </div>
-
-    <!-- Команда 2 (красные) -->
-    <div class="team-section">
-        <div class="team-title team2">Команда 2 (красные)</div>
-        <div id="team2-grid" class="characters-grid"></div>
+        <div class="pair-panel" id="pairB-panel">
+            <div class="pair-title red">Пара B</div>
+            <div class="pair-mana">🌀 Мана: <span id="mana-pairB">0</span></div>
+            <div class="pair-actions">
+                <div class="move-global">
+                    <input type="number" id="move-cost-pairB" value="1" step="1">
+                    <button id="move-btn-pairB">🚶 Движ</button>
+                </div>
+                <button id="undo-btn-pairB" class="back-btn">↩️ Назад</button>
+                <button id="undo-turn-btn-pairB" class="undo-turn-btn">⏪ Вернуть ход</button>
+                <button id="end-turn-btn-pairB" class="end-turn-btn">✨ Завершить ход</button>
+                <button id="kill-btn-pairB" class="kill-btn">💀 Убил Хранителя</button>
+            </div>
+            <div id="pairB-grid" class="characters-grid"></div>
+        </div>
     </div>
 
     <div class="notes-section">
-        <textarea id="notes-text" rows="3" placeholder="Ваши заметки..."></textarea>
-        <button id="save-notes-btn">💾 Применить изменения</button>
+        <textarea id="notes-text" rows="2" placeholder="Заметки..."></textarea>
+        <button id="save-notes-btn">💾 Сохранить</button>
     </div>
     <div class="footer">
         <strong>ПАМЯТКА:</strong><br>
-        Инструкция актуальна для всех способностей, если не указано другое:<br>
         1) Сквозь стены наносить урон нельзя.<br>
-        2) Если указано, что способность действует в радиусе какого-то числа клеток, значит её можно использовать только, если до неё можно проложить путь внутри квадрата, образованного этим радиусом.<br>
-        3) У всех персонажей максимум 15 хп, кроме Серпенса (18 хп) и Инквизитора (21 хп).<br>
-        4) максимальное число маны команды = 15, за каждый ход добавляется 5 маны.<br>
+        2) Радиус – путь внутри квадрата.<br>
+        3) Максимум хп: 15 (Серпенс 18, Инквизитор 21).<br>
+        4) Максимум маны = 15, за ход +5.<br>
+        5) Каждая пара имеет свою ману и кнопки.
     </div>
 </div>
 
 <script>
     (function() {
-        // ----- ПОЛНЫЙ СПИСОК ПЕРСОНАЖЕЙ (ОБНОВЛЁННЫЙ) -----
         const fullCharacters = [
     { id: 1, name: "Темпос", hp: 15, abilities: [
         { name: "Самурай", mana: 5, type: "normal", description: "рывок по прямой 2-4 клеток, наносящий всем на своем пути 4 урона." },
@@ -468,38 +475,25 @@
     ] }
 ];
 
-        // Данные призываемых существ
+        // Данные призываемых существ (те же)
         const skeletonData = { id: 999, name: "Скелет", hp: 5, abilities: [{ name: "Копьё", mana: 3, type: "normal", description: "наносит 3 урона в радиусе 2 клеток или 2 урона в сумме 4 клеток." }] };
         const snakeData = { id: 998, name: "Змея", hp: 6, abilities: [{ name: "Яд", mana: 2, type: "normal", description: "наносит 4 урона ядом в радиусе 3 клеток." }] };
 
-        function getNameColorClass(name) {
-            const map = {
-                "Темпос": "name-cyan", "Гоуст": "name-pink", "Портал": "name-pink", "Иллюжн": "name-pink",
-                "Форс": "name-pink", "Вита": "name-green", "Аюно": "name-red", "Вампир": "name-red",
-                "Серпенс": "name-red", "Санг": "name-red", "Ион": "name-purple", "Айси": "name-purple", "Друид": "name-purple",
-                "Магмус": "name-purple", "Нано": "name-gold", "Сайтер": "name-gold", "Кёрс": "name-gold",
-                "Гэмбл": "name-gold", "Биоробот": "name-gold", "Ниндзя": "name-gold", "Дипломат": "name-gold", "Экспонент": "name-blue",
-                "Берсерк": "name-red", "Уинди": "name-purple", "Фаермен": "name-purple", "Ёрскуэйк": "name-purple", "Гард": "name-purple",
-                "Инквизитор": "name-gold"
-            };
-            return map[name] || "";
-        }
-
-        let team1Chars = [];
-        let team2Chars = [];
-        let allCharacters = [];
-        let currentMana1 = 15;
-        let currentMana2 = 15;
+        // Состояния для четырёх пар
+        let pairChars = {
+            pair1: [], pair2: [], pairA: [], pairB: []
+        };
+        let currentMana = { pair1: 15, pair2: 15, pairA: 15, pairB: 15 };
         let charactersHP = {};
-        let actionHistory = [];
+        let actionHistory = {}; // для каждой пары своя история
         let usedUniqueAbilities = {};
-        let blockedVenomAbilities1 = {}; // для команды 1
-        let blockedVenomAbilities2 = {}; // для команды 2
-        let turnStates = [];
+        let blockedVenomAbilities = { pair1: {}, pair2: {}, pairA: {}, pairB: {} };
+        let turnStates = { pair1: [], pair2: [], pairA: [], pairB: [] };
 
+        // Вспомогательные функции (общие)
         function getMaxHpForCharacter(charId, charName) {
             if (charId === 9 || charName === "Серпенс") return 18;
-            if (charId === 19 || charName === "Серпенс") return 21;
+            if (charId === 19 || charName === "Инквизитор") return 21;
             return 15;
         }
         function clampHp(value, charId, charName) {
@@ -508,156 +502,127 @@
         }
         function clampMana(v) { return Math.min(15, Math.max(0, v)); }
 
-        function hasSummonInTeam(team, summonId) {
-            if (team === 1) return team1Chars.some(c => c.id === summonId);
-            else return team2Chars.some(c => c.id === summonId);
+        // Функции для призывов (скелет/змея) – добавляются в конкретную пару
+        function hasSummonInPair(pairKey, summonId) {
+            return pairChars[pairKey].some(c => c.id === summonId);
         }
-        function addSummonToTeam(team, data) {
+        function addSummonToPair(pairKey, data) {
             const summon = JSON.parse(JSON.stringify(data));
-            if (team === 1) {
-                if (hasSummonInTeam(1, summon.id)) return false;
-                team1Chars.push(summon);
-            } else {
-                if (hasSummonInTeam(2, summon.id)) return false;
-                team2Chars.push(summon);
-            }
-            allCharacters.push(summon);
+            if (hasSummonInPair(pairKey, summon.id)) return false;
+            pairChars[pairKey].push(summon);
             charactersHP[summon.id] = summon.hp;
             return true;
         }
-        function removeSummonFromTeam(team, summonId) {
-            let idx = -1;
-            if (team === 1) idx = team1Chars.findIndex(c => c.id === summonId);
-            else idx = team2Chars.findIndex(c => c.id === summonId);
+        function removeSummonFromPair(pairKey, summonId) {
+            const idx = pairChars[pairKey].findIndex(c => c.id === summonId);
             if (idx !== -1) {
-                const removed = (team === 1) ? team1Chars[idx] : team2Chars[idx];
-                if (team === 1) team1Chars.splice(idx, 1);
-                else team2Chars.splice(idx, 1);
-                const allIdx = allCharacters.findIndex(c => c.id === summonId);
-                if (allIdx !== -1) allCharacters.splice(allIdx, 1);
+                const removed = pairChars[pairKey][idx];
+                pairChars[pairKey].splice(idx, 1);
                 delete charactersHP[summonId];
                 return removed;
             }
             return null;
         }
-        function removeCharacterById(charId, team) {
-            let idx = -1;
-            let removed = null;
-            if (team === 1) idx = team1Chars.findIndex(c => c.id === charId);
-            else idx = team2Chars.findIndex(c => c.id === charId);
-            if (idx !== -1) {
-                removed = (team === 1) ? team1Chars[idx] : team2Chars[idx];
-                if (team === 1) team1Chars.splice(idx, 1);
-                else team2Chars.splice(idx, 1);
-                const allIdx = allCharacters.findIndex(c => c.id === charId);
-                if (allIdx !== -1) allCharacters.splice(allIdx, 1);
-                delete charactersHP[charId];
-            }
-            return removed;
+        function removeSummonOnMasterDeath(masterId, pairKey) {
+            if (masterId === 7) removeSummonFromPair(pairKey, skeletonData.id);
+            else if (masterId === 9) removeSummonFromPair(pairKey, snakeData.id);
         }
-        function restoreCharacter(character, hpValue, team) {
-            if (team === 1) {
-                if (!team1Chars.some(c => c.id === character.id)) {
-                    team1Chars.push(JSON.parse(JSON.stringify(character)));
-                    allCharacters.push(JSON.parse(JSON.stringify(character)));
-                    charactersHP[character.id] = hpValue;
-                    return true;
-                }
-            } else if (team === 2) {
-                if (!team2Chars.some(c => c.id === character.id)) {
-                    team2Chars.push(JSON.parse(JSON.stringify(character)));
-                    allCharacters.push(JSON.parse(JSON.stringify(character)));
-                    charactersHP[character.id] = hpValue;
-                    return true;
-                }
+
+        function removeCharacterById(charId, pairKey) {
+            const idx = pairChars[pairKey].findIndex(c => c.id === charId);
+            if (idx !== -1) {
+                const removed = pairChars[pairKey][idx];
+                pairChars[pairKey].splice(idx, 1);
+                delete charactersHP[charId];
+                return removed;
+            }
+            return null;
+        }
+        function restoreCharacter(character, hpValue, pairKey) {
+            if (!pairChars[pairKey].some(c => c.id === character.id)) {
+                pairChars[pairKey].push(JSON.parse(JSON.stringify(character)));
+                charactersHP[character.id] = hpValue;
+                return true;
             }
             return false;
         }
 
-        function removeSummonOnMasterDeath(masterId, masterTeam) {
-            if (masterId === 7) removeSummonFromTeam(masterTeam, skeletonData.id);
-            else if (masterId === 9) removeSummonFromTeam(masterTeam, snakeData.id);
-        }
-
-        function persistState() {
-            localStorage.setItem('currentMana1', currentMana1);
-            localStorage.setItem('currentMana2', currentMana2);
-            localStorage.setItem('charactersHP', JSON.stringify(charactersHP));
-            localStorage.setItem('actionHistory', JSON.stringify(actionHistory));
-            localStorage.setItem('usedUniqueAbilities', JSON.stringify(usedUniqueAbilities));
-            localStorage.setItem('blockedVenomAbilities1', JSON.stringify(blockedVenomAbilities1));
-            localStorage.setItem('blockedVenomAbilities2', JSON.stringify(blockedVenomAbilities2));
-            localStorage.setItem('turnStates', JSON.stringify(turnStates));
-        }
-
+        // Загрузка сохранённых данных
         function loadGameState() {
-            const team1Ids = localStorage.getItem('team1');
-            const team2Ids = localStorage.getItem('team2');
-            if (!team1Ids || !team2Ids) {
-                alert('Не выбраны команды!');
-                window.location.href = 'index.html';
+            // Загружаем ID персонажей для каждой пары
+            const pair1Ids = localStorage.getItem('team1_pair1');
+            const pair2Ids = localStorage.getItem('team1_pair2');
+            const pairAIds = localStorage.getItem('team2_pairA');
+            const pairBIds = localStorage.getItem('team2_pairB');
+            if (!pair1Ids || !pair2Ids || !pairAIds || !pairBIds) {
+                alert('Не выбраны все пары!');
+                window.location.href = '1coupleA_4x4.html';
                 return false;
             }
-            const ids1 = JSON.parse(team1Ids);
-            const ids2 = JSON.parse(team2Ids);
-            team1Chars = fullCharacters.filter(c => ids1.includes(c.id));
-            team2Chars = fullCharacters.filter(c => ids2.includes(c.id));
-            allCharacters = [...team1Chars, ...team2Chars];
+            const ids1 = JSON.parse(pair1Ids);
+            const ids2 = JSON.parse(pair2Ids);
+            const idsA = JSON.parse(pairAIds);
+            const idsB = JSON.parse(pairBIds);
+            pairChars.pair1 = fullCharacters.filter(c => ids1.includes(c.id));
+            pairChars.pair2 = fullCharacters.filter(c => ids2.includes(c.id));
+            pairChars.pairA = fullCharacters.filter(c => idsA.includes(c.id));
+            pairChars.pairB = fullCharacters.filter(c => idsB.includes(c.id));
 
-            const savedHP = localStorage.getItem('charactersHP');
+            // Загружаем HP
+            const savedHP = localStorage.getItem('charactersHP_4x4');
             if (savedHP) {
                 try { charactersHP = JSON.parse(savedHP); } catch(e) {}
             }
             if (Object.keys(charactersHP).length === 0) {
-                allCharacters.forEach(ch => { charactersHP[ch.id] = ch.hp; });
+                for (let pair in pairChars) {
+                    pairChars[pair].forEach(ch => { charactersHP[ch.id] = ch.hp; });
+                }
             }
 
-            const savedMana1 = localStorage.getItem('currentMana1');
-            currentMana1 = savedMana1 !== null ? parseInt(savedMana1, 10) : 15;
-            const savedMana2 = localStorage.getItem('currentMana2');
-            currentMana2 = savedMana2 !== null ? parseInt(savedMana2, 10) : 15;
+            // Мана
+            const savedMana = localStorage.getItem('currentMana_4x4');
+            if (savedMana) {
+                try { currentMana = JSON.parse(savedMana); } catch(e) {}
+            }
+            // История действий, уникальные способности, блокировки, стейты – аналогично
+            const savedHistory = localStorage.getItem('actionHistory_4x4');
+            if (savedHistory) { try { actionHistory = JSON.parse(savedHistory); } catch(e) { actionHistory = {}; } }
+            const savedUnique = localStorage.getItem('usedUniqueAbilities_4x4');
+            if (savedUnique) { try { usedUniqueAbilities = JSON.parse(savedUnique); } catch(e) { usedUniqueAbilities = {}; } }
+            const savedVenom = localStorage.getItem('blockedVenomAbilities_4x4');
+            if (savedVenom) { try { blockedVenomAbilities = JSON.parse(savedVenom); } catch(e) { blockedVenomAbilities = { pair1: {}, pair2: {}, pairA: {}, pairB: {} }; } }
+            const savedTurns = localStorage.getItem('turnStates_4x4');
+            if (savedTurns) { try { turnStates = JSON.parse(savedTurns); } catch(e) { turnStates = { pair1: [], pair2: [], pairA: [], pairB: [] }; } }
 
-            const savedHistory = localStorage.getItem('actionHistory');
-            if (savedHistory) {
-                try { actionHistory = JSON.parse(savedHistory); } catch(e) { actionHistory = []; }
-            }
-            const savedUnique = localStorage.getItem('usedUniqueAbilities');
-            if (savedUnique) {
-                try { usedUniqueAbilities = JSON.parse(savedUnique); } catch(e) { usedUniqueAbilities = {}; }
-            }
-            const savedVenom1 = localStorage.getItem('blockedVenomAbilities1');
-            if (savedVenom1) {
-                try { blockedVenomAbilities1 = JSON.parse(savedVenom1); } catch(e) { blockedVenomAbilities1 = {}; }
-            }
-            const savedVenom2 = localStorage.getItem('blockedVenomAbilities2');
-            if (savedVenom2) {
-                try { blockedVenomAbilities2 = JSON.parse(savedVenom2); } catch(e) { blockedVenomAbilities2 = {}; }
-            }
-            const savedTurns = localStorage.getItem('turnStates');
-            if (savedTurns) {
-                try { turnStates = JSON.parse(savedTurns); } catch(e) { turnStates = []; }
-            }
             return true;
         }
 
-        function renderTeam(team, containerId, cardClass) {
+        function persistState() {
+            localStorage.setItem('currentMana_4x4', JSON.stringify(currentMana));
+            localStorage.setItem('charactersHP_4x4', JSON.stringify(charactersHP));
+            localStorage.setItem('actionHistory_4x4', JSON.stringify(actionHistory));
+            localStorage.setItem('usedUniqueAbilities_4x4', JSON.stringify(usedUniqueAbilities));
+            localStorage.setItem('blockedVenomAbilities_4x4', JSON.stringify(blockedVenomAbilities));
+            localStorage.setItem('turnStates_4x4', JSON.stringify(turnStates));
+        }
+
+        // Отрисовка сетки для конкретной пары
+        function renderPair(pairKey, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            const teamChars = (team === 1) ? team1Chars : team2Chars;
             container.innerHTML = '';
-            teamChars.forEach(char => {
+            pairChars[pairKey].forEach(char => {
                 const currentHp = charactersHP[char.id] !== undefined ? charactersHP[char.id] : char.hp;
                 const colorClass = getNameColorClass(char.name);
                 const card = document.createElement('div');
-                card.className = `character-card ${cardClass}`;
+                card.className = 'character-card';
                 card.dataset.id = char.id;
                 let abilitiesHtml = '<div class="abilities">';
                 char.abilities.forEach((ab, idx) => {
                     abilitiesHtml += `
                         <div class="ability-wrapper">
                             <button class="ability-btn" data-ability-index="${idx}">
-                                <span class="ability-name">${ab.name}</span>
-                                <span class="ability-cost">${ab.mana} маны</span>
+                                <span>${ab.name} (${ab.mana})</span>
                             </button>
                             <div class="ability-desc">${ab.description}</div>
                         </div>
@@ -670,7 +635,7 @@
                         <span class="hp-value">❤️ ${currentHp}</span>
                         <div class="hp-control">
                             <input type="number" class="hp-delta-input" placeholder="изм." value="0" step="1">
-                            <button class="hp-change-btn">Изменить здоровье</button>
+                            <button class="hp-change-btn">Изменить</button>
                         </div>
                     </div>
                     ${abilitiesHtml}
@@ -680,89 +645,64 @@
         }
 
         function renderAll() {
-            renderTeam(1, 'team1-grid', 'team1-card');
-            renderTeam(2, 'team2-grid', 'team2-card');
+            renderPair('pair1', 'pair1-grid');
+            renderPair('pair2', 'pair2-grid');
+            renderPair('pairA', 'pairA-grid');
+            renderPair('pairB', 'pairB-grid');
             updateUI();
         }
 
         function updateUI() {
-            document.getElementById('mana-value1').textContent = currentMana1;
-            document.getElementById('mana-value2').textContent = currentMana2;
-
-            const moveCost1 = document.getElementById('move-cost1');
-            const moveBtn1 = document.getElementById('move-global-btn1');
-            if (moveCost1 && moveBtn1) {
-                const val = parseInt(moveCost1.value, 10);
-                moveBtn1.disabled = isNaN(val) || val <= 0 || currentMana1 < val;
+            for (let pair of ['pair1', 'pair2', 'pairA', 'pairB']) {
+                document.getElementById(`mana-${pair}`).textContent = currentMana[pair];
+                const moveCost = document.getElementById(`move-cost-${pair}`);
+                const moveBtn = document.getElementById(`move-btn-${pair}`);
+                if (moveCost && moveBtn) {
+                    const val = parseInt(moveCost.value, 10);
+                    moveBtn.disabled = isNaN(val) || val <= 0 || currentMana[pair] < val;
+                }
             }
-            const moveCost2 = document.getElementById('move-cost2');
-            const moveBtn2 = document.getElementById('move-global-btn2');
-            if (moveCost2 && moveBtn2) {
-                const val = parseInt(moveCost2.value, 10);
-                moveBtn2.disabled = isNaN(val) || val <= 0 || currentMana2 < val;
-            }
-
+            // Обновляем кнопки способностей для всех карточек
             document.querySelectorAll('.character-card').forEach(card => {
                 const charId = parseInt(card.dataset.id);
-                const char = allCharacters.find(c => c.id === charId);
-                if (!char) return;
-
-                let team = null;
-                if (team1Chars.some(c => c.id === charId)) team = 1;
-                else if (team2Chars.some(c => c.id === charId)) team = 2;
-                if (team === null) return;
-
-                const mana = (team === 1) ? currentMana1 : currentMana2;
-                const blockedVenom = (team === 1) ? blockedVenomAbilities1 : blockedVenomAbilities2;
-
+                let foundPair = null;
+                for (let p of ['pair1', 'pair2', 'pairA', 'pairB']) {
+                    if (pairChars[p].some(c => c.id === charId)) {
+                        foundPair = p;
+                        break;
+                    }
+                }
+                if (!foundPair) return;
+                const mana = currentMana[foundPair];
+                const blocked = blockedVenomAbilities[foundPair];
                 const btns = card.querySelectorAll('.ability-btn');
                 btns.forEach((btn, idx) => {
+                    const char = pairChars[foundPair].find(c => c.id === charId);
+                    if (!char) return;
                     const ab = char.abilities[idx];
                     const key = `${charId}_${idx}`;
                     let disabled = false;
                     if (ab.type === 'unique') disabled = usedUniqueAbilities[key] === true;
-                    if (ab.type === 'venom') disabled = blockedVenom[key] === true;
+                    if (ab.type === 'venom') disabled = blocked[key] === true;
                     if (mana < ab.mana) disabled = true;
                     btn.disabled = disabled;
                 });
             });
         }
 
-        function handleRandomAbility(ability, character, abilityIdx, team) {
-            const name = ability.name;
-            const match = name.match(/^Р(\d+)?/);
-            let count = 1;
-            if (match && match[1]) count = parseInt(match[1], 10);
-            const numbers = [];
-            for (let i = 0; i < count; i++) numbers.push(Math.floor(Math.random() * 10) + 1);
-            alert(`🎲 Случайные числа (${count}): ${numbers.join(', ')}`);
-            let mana = (team === 1) ? currentMana1 : currentMana2;
-            mana = clampMana(mana - ability.mana);
-            if (team === 1) currentMana1 = mana;
-            else currentMana2 = mana;
-            const key = `${character.id}_${abilityIdx}`;
-            actionHistory.push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
-            if (ability.type === 'unique') usedUniqueAbilities[key] = true;
-            else if (ability.type === 'venom') {
-                if (team === 1) blockedVenomAbilities1[key] = true;
-                else blockedVenomAbilities2[key] = true;
-            }
-            persistState();
-            renderAll();
-        }
-
-        function useAbility(character, abilityIdx, team) {
+        // Функции действий (способности, изменение HP, движение, убийство, откаты)
+        function useAbility(character, abilityIdx, pairKey) {
             const ability = character.abilities[abilityIdx];
             const key = `${character.id}_${abilityIdx}`;
-            let mana = (team === 1) ? currentMana1 : currentMana2;
-            const blockedVenom = (team === 1) ? blockedVenomAbilities1 : blockedVenomAbilities2;
+            let mana = currentMana[pairKey];
+            const blocked = blockedVenomAbilities[pairKey];
 
             if (ability.type === 'unique' && usedUniqueAbilities[key]) {
-                alert('Эта способность уже использована один раз за игру!');
+                alert('Уникальная способность уже использована!');
                 return;
             }
-            if (ability.type === 'venom' && blockedVenom[key]) {
-                alert('Эта способность временно недоступна. Убейте врага, чтобы восстановить её.');
+            if (ability.type === 'venom' && blocked[key]) {
+                alert('В-способность временно недоступна. Убейте врага.');
                 return;
             }
             if (mana < ability.mana) {
@@ -770,168 +710,125 @@
                 return;
             }
 
-            // Призыв скелета (Аюно id=7)
+            // Призывы
             if (character.id === 7 && abilityIdx === 1 && ability.name === "В - Призыв скелета") {
-                if (hasSummonInTeam(team, skeletonData.id)) { alert('Скелет уже призван в этой команде!'); return; }
+                if (hasSummonInPair(pairKey, skeletonData.id)) { alert('Скелет уже призван!'); return; }
                 mana = clampMana(mana - ability.mana);
-                if (team === 1) currentMana1 = mana;
-                else currentMana2 = mana;
-                addSummonToTeam(team, skeletonData);
-                actionHistory.push({ type: 'summonSkeleton', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
-                if (ability.type === 'venom') {
-                    if (team === 1) blockedVenomAbilities1[key] = true;
-                    else blockedVenomAbilities2[key] = true;
-                }
+                currentMana[pairKey] = mana;
+                addSummonToPair(pairKey, skeletonData);
+                if (!actionHistory[pairKey]) actionHistory[pairKey] = [];
+                actionHistory[pairKey].push({ type: 'summonSkeleton', abilityKey: key, abilityType: ability.type, cost: ability.mana });
+                if (ability.type === 'venom') blockedVenomAbilities[pairKey][key] = true;
                 persistState();
                 renderAll();
                 return;
             }
-
-            // Призыв змеи (Серпенс id=9)
             if (character.id === 9 && abilityIdx === 1 && ability.name === "В - Призыв змеи") {
-                if (hasSummonInTeam(team, snakeData.id)) { alert('Змея уже призвана в этой команде!'); return; }
+                if (hasSummonInPair(pairKey, snakeData.id)) { alert('Змея уже призвана!'); return; }
                 mana = clampMana(mana - ability.mana);
-                if (team === 1) currentMana1 = mana;
-                else currentMana2 = mana;
-                addSummonToTeam(team, snakeData);
-                actionHistory.push({ type: 'summonSnake', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
-                if (ability.type === 'venom') {
-                    if (team === 1) blockedVenomAbilities1[key] = true;
-                    else blockedVenomAbilities2[key] = true;
-                }
+                currentMana[pairKey] = mana;
+                addSummonToPair(pairKey, snakeData);
+                if (!actionHistory[pairKey]) actionHistory[pairKey] = [];
+                actionHistory[pairKey].push({ type: 'summonSnake', abilityKey: key, abilityType: ability.type, cost: ability.mana });
+                if (ability.type === 'venom') blockedVenomAbilities[pairKey][key] = true;
                 persistState();
                 renderAll();
                 return;
             }
 
+            // Обычная способность или random
             if (ability.type === 'random') {
-                handleRandomAbility(ability, character, abilityIdx, team);
-                return;
+                const match = ability.name.match(/^Р(\d+)?/);
+                let count = 1;
+                if (match && match[1]) count = parseInt(match[1], 10);
+                const numbers = [];
+                for (let i = 0; i < count; i++) numbers.push(Math.floor(Math.random() * 10) + 1);
+                alert(`🎲 Случайные числа (${count}): ${numbers.join(', ')}`);
             }
-
             mana = clampMana(mana - ability.mana);
-            if (team === 1) currentMana1 = mana;
-            else currentMana2 = mana;
-            actionHistory.push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana, team: team });
+            currentMana[pairKey] = mana;
+            if (!actionHistory[pairKey]) actionHistory[pairKey] = [];
+            actionHistory[pairKey].push({ type: 'ability', abilityKey: key, abilityType: ability.type, cost: ability.mana });
             if (ability.type === 'unique') usedUniqueAbilities[key] = true;
-            else if (ability.type === 'venom') {
-                if (team === 1) blockedVenomAbilities1[key] = true;
-                else blockedVenomAbilities2[key] = true;
-            }
+            else if (ability.type === 'venom') blockedVenomAbilities[pairKey][key] = true;
             persistState();
             renderAll();
         }
 
-        function changeHP(character, delta, team) {
+        function changeHP(character, delta, pairKey) {
             if (delta === 0) return;
             let newHp = charactersHP[character.id] + delta;
             const wasAlive = charactersHP[character.id] > 0;
             newHp = clampHp(newHp, character.id, character.name);
             if (newHp <= 0 && wasAlive) {
-                if (!confirm(`${character.name} получает ${-delta} урона и погибает! Продолжить?`)) return;
-                removeSummonOnMasterDeath(character.id, team);
-                const removedChar = removeCharacterById(character.id, team);
+                if (!confirm(`${character.name} погибает! Продолжить?`)) return;
+                removeSummonOnMasterDeath(character.id, pairKey);
+                const removedChar = removeCharacterById(character.id, pairKey);
                 if (removedChar) {
-                    actionHistory.push({ type: 'death', charId: character.id, removedChar: removedChar, previousHp: charactersHP[character.id], team: team });
+                    if (!actionHistory[pairKey]) actionHistory[pairKey] = [];
+                    actionHistory[pairKey].push({ type: 'death', charId: character.id, removedChar: removedChar, previousHp: charactersHP[character.id] });
                     delete charactersHP[character.id];
                 }
             } else {
                 charactersHP[character.id] = newHp;
-                actionHistory.push({ type: 'hpChange', charId: character.id, delta: delta, team: team });
+                if (!actionHistory[pairKey]) actionHistory[pairKey] = [];
+                actionHistory[pairKey].push({ type: 'hpChange', charId: character.id, delta: delta });
             }
             persistState();
             renderAll();
         }
 
-        function globalMove(team) {
-            const costInput = document.getElementById(`move-cost${team}`);
+        function globalMove(pairKey) {
+            const costInput = document.getElementById(`move-cost-${pairKey}`);
             let cost = parseInt(costInput.value, 10);
             if (isNaN(cost) || cost <= 0) { alert('Введите положительное число маны'); return; }
-            let mana = (team === 1) ? currentMana1 : currentMana2;
-            if (mana >= cost) {
-                mana = clampMana(mana - cost);
-                if (team === 1) currentMana1 = mana;
-                else currentMana2 = mana;
-                actionHistory.push({ type: 'move', cost: cost, team: team });
+            if (currentMana[pairKey] >= cost) {
+                currentMana[pairKey] = clampMana(currentMana[pairKey] - cost);
+                if (!actionHistory[pairKey]) actionHistory[pairKey] = [];
+                actionHistory[pairKey].push({ type: 'move', cost: cost });
                 persistState();
                 renderAll();
                 costInput.value = 1;
             } else {
-                alert(`Не хватает маны! Нужно ${cost}, есть ${mana}`);
+                alert(`Не хватает маны! Нужно ${cost}, есть ${currentMana[pairKey]}`);
             }
         }
 
-        function killEnemy(team) {
-            if (team === 1) {
-                blockedVenomAbilities1 = {};
-            } else {
-                blockedVenomAbilities2 = {};
-            }
-            let mana = (team === 1) ? currentMana1 : currentMana2;
-            mana = clampMana(mana + 3);
-            if (team === 1) currentMana1 = mana;
-            else currentMana2 = mana;
+        function killEnemy(pairKey) {
+            blockedVenomAbilities[pairKey] = {};
+            currentMana[pairKey] = clampMana(currentMana[pairKey] + 3);
             persistState();
             renderAll();
-            alert(`Враг повержен! +3 маны команде ${team}. Способности с префиксом "В" снова доступны.`);
+            alert(`+3 маны паре ${pairKey}. В-способности восстановлены.`);
         }
 
-        function undo() {
-            if (actionHistory.length === 0) { alert('Нет действий для отмены'); return; }
-            const last = actionHistory.pop();
+        function undo(pairKey) {
+            if (!actionHistory[pairKey] || actionHistory[pairKey].length === 0) { alert('Нет действий для отмены'); return; }
+            const last = actionHistory[pairKey].pop();
             switch (last.type) {
                 case 'ability':
-                    {
-                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
-                        mana = clampMana(mana + last.cost);
-                        if (last.team === 1) currentMana1 = mana;
-                        else currentMana2 = mana;
-                        if (last.abilityType === 'unique') delete usedUniqueAbilities[last.abilityKey];
-                        else if (last.abilityType === 'venom') {
-                            if (last.team === 1) delete blockedVenomAbilities1[last.abilityKey];
-                            else delete blockedVenomAbilities2[last.abilityKey];
-                        }
-                    }
+                    currentMana[pairKey] = clampMana(currentMana[pairKey] + last.cost);
+                    if (last.abilityType === 'unique') delete usedUniqueAbilities[last.abilityKey];
+                    else if (last.abilityType === 'venom') delete blockedVenomAbilities[pairKey][last.abilityKey];
                     break;
                 case 'move':
-                    {
-                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
-                        mana = clampMana(mana + last.cost);
-                        if (last.team === 1) currentMana1 = mana;
-                        else currentMana2 = mana;
-                    }
+                    currentMana[pairKey] = clampMana(currentMana[pairKey] + last.cost);
                     break;
                 case 'hpChange':
                     charactersHP[last.charId] -= last.delta;
                     break;
                 case 'summonSkeleton':
-                    {
-                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
-                        mana = clampMana(mana + last.cost);
-                        if (last.team === 1) currentMana1 = mana;
-                        else currentMana2 = mana;
-                        removeSummonFromTeam(last.team, skeletonData.id);
-                        if (last.abilityType === 'venom') {
-                            if (last.team === 1) delete blockedVenomAbilities1[last.abilityKey];
-                            else delete blockedVenomAbilities2[last.abilityKey];
-                        }
-                    }
+                    currentMana[pairKey] = clampMana(currentMana[pairKey] + last.cost);
+                    removeSummonFromPair(pairKey, skeletonData.id);
+                    if (last.abilityType === 'venom') delete blockedVenomAbilities[pairKey][last.abilityKey];
                     break;
                 case 'summonSnake':
-                    {
-                        let mana = (last.team === 1) ? currentMana1 : currentMana2;
-                        mana = clampMana(mana + last.cost);
-                        if (last.team === 1) currentMana1 = mana;
-                        else currentMana2 = mana;
-                        removeSummonFromTeam(last.team, snakeData.id);
-                        if (last.abilityType === 'venom') {
-                            if (last.team === 1) delete blockedVenomAbilities1[last.abilityKey];
-                            else delete blockedVenomAbilities2[last.abilityKey];
-                        }
-                    }
+                    currentMana[pairKey] = clampMana(currentMana[pairKey] + last.cost);
+                    removeSummonFromPair(pairKey, snakeData.id);
+                    if (last.abilityType === 'venom') delete blockedVenomAbilities[pairKey][last.abilityKey];
                     break;
                 case 'death':
-                    restoreCharacter(last.removedChar, last.previousHp, last.team);
+                    restoreCharacter(last.removedChar, last.previousHp, pairKey);
                     charactersHP[last.charId] = last.previousHp;
                     break;
             }
@@ -939,73 +836,54 @@
             renderAll();
         }
 
-        function pushTurnState() {
-            turnStates.push({
-                currentMana1: currentMana1,
-                currentMana2: currentMana2,
+        function pushTurnState(pairKey) {
+            if (!turnStates[pairKey]) turnStates[pairKey] = [];
+            turnStates[pairKey].push({
+                currentMana: currentMana[pairKey],
                 charactersHP: { ...charactersHP },
                 usedUniqueAbilities: { ...usedUniqueAbilities },
-                blockedVenomAbilities1: { ...blockedVenomAbilities1 },
-                blockedVenomAbilities2: { ...blockedVenomAbilities2 },
-                team1Chars: JSON.parse(JSON.stringify(team1Chars)),
-                team2Chars: JSON.parse(JSON.stringify(team2Chars))
+                blockedVenomAbilities: { ...blockedVenomAbilities[pairKey] },
+                pairChars: JSON.parse(JSON.stringify(pairChars[pairKey]))
             });
-            if (turnStates.length > 20) turnStates.shift();
+            if (turnStates[pairKey].length > 20) turnStates[pairKey].shift();
             persistState();
         }
 
-        function undoLastTurn() {
-            if (turnStates.length === 0) { alert('Нет сохранённых ходов'); return; }
-            const lastState = turnStates.pop();
-            currentMana1 = lastState.currentMana1;
-            currentMana2 = lastState.currentMana2;
+        function undoLastTurn(pairKey) {
+            if (!turnStates[pairKey] || turnStates[pairKey].length === 0) { alert('Нет сохранённых ходов'); return; }
+            const lastState = turnStates[pairKey].pop();
+            currentMana[pairKey] = lastState.currentMana;
             charactersHP = { ...lastState.charactersHP };
             usedUniqueAbilities = { ...lastState.usedUniqueAbilities };
-            blockedVenomAbilities1 = { ...lastState.blockedVenomAbilities1 };
-            blockedVenomAbilities2 = { ...lastState.blockedVenomAbilities2 };
-            team1Chars = JSON.parse(JSON.stringify(lastState.team1Chars));
-            team2Chars = JSON.parse(JSON.stringify(lastState.team2Chars));
-            allCharacters = [...team1Chars, ...team2Chars];
-            actionHistory = [];
+            blockedVenomAbilities[pairKey] = { ...lastState.blockedVenomAbilities };
+            pairChars[pairKey] = JSON.parse(JSON.stringify(lastState.pairChars));
+            actionHistory[pairKey] = [];
             persistState();
             renderAll();
-            alert('Ход откачён!');
+            alert('Ход пары откачён!');
         }
 
-        function endTurn(team) {
-            pushTurnState();
-            if (team === 1) {
-                currentMana1 = clampMana(currentMana1 + 5);
-            } else {
-                currentMana2 = clampMana(currentMana2 + 5);
-            }
-            actionHistory = [];
+        function endTurn(pairKey) {
+            pushTurnState(pairKey);
+            currentMana[pairKey] = clampMana(currentMana[pairKey] + 5);
+            actionHistory[pairKey] = [];
             persistState();
             renderAll();
         }
 
         function changeTeam() {
-            if (confirm('Вы уверены, что хотите сменить команды? Весь прогресс будет потерян.')) {
+            if (confirm('Сменить команды? Весь прогресс будет потерян.')) {
                 localStorage.clear();
                 window.location.href = 'index.html';
             }
         }
 
-        function loadNotes() {
-            const saved = localStorage.getItem('notes');
-            if (saved !== null) document.getElementById('notes-text').value = saved;
-        }
-        function saveNotes() {
-            localStorage.setItem('notes', document.getElementById('notes-text').value);
-            alert('Заметки сохранены');
-        }
-
-        function handleGridClick(e, team) {
+        function handleGridClick(e, pairKey) {
             const target = e.target;
             const card = target.closest('.character-card');
             if (!card) return;
             const charId = parseInt(card.dataset.id);
-            const character = allCharacters.find(c => c.id === charId);
+            const character = pairChars[pairKey].find(c => c.id === charId);
             if (!character) return;
 
             if (target.classList.contains('hp-change-btn')) {
@@ -1013,7 +891,7 @@
                 let delta = parseInt(input.value, 10);
                 if (isNaN(delta)) delta = 0;
                 if (delta !== 0) {
-                    changeHP(character, delta, team);
+                    changeHP(character, delta, pairKey);
                     input.value = 0;
                 }
                 return;
@@ -1023,55 +901,47 @@
                 const btn = wrapper.querySelector('.ability-btn');
                 if (btn && !btn.disabled) {
                     const idx = parseInt(btn.dataset.abilityIndex);
-                    if (!isNaN(idx)) useAbility(character, idx, team);
+                    if (!isNaN(idx)) useAbility(character, idx, pairKey);
                 }
                 return;
             }
         }
 
-        function initStickyMenus() {
-            const menu1 = document.getElementById('menu-team1');
-            const menu2 = document.getElementById('menu-team2');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.target === menu2) {
-                        if (entry.isIntersecting) {
-                            menu1.classList.remove('sticky');
-                            menu2.classList.add('sticky');
-                        } else {
-                            menu2.classList.remove('sticky');
-                            menu1.classList.add('sticky');
-                        }
-                    }
-                });
-            }, { threshold: 0, rootMargin: '0px 0px -100% 0px' });
-            observer.observe(menu2);
-            menu1.classList.add('sticky');
+        function getNameColorClass(name) {
+            const map = {
+                "Темпос": "name-cyan", "Гоуст": "name-pink", "Портал": "name-pink", "Иллюжн": "name-pink",
+                "Форс": "name-pink", "Вита": "name-green", "Аюно": "name-red", "Вампир": "name-red",
+                "Серпенс": "name-red", "Санг": "name-red", "Ион": "name-purple", "Айси": "name-purple", "Друид": "name-purple",
+                "Магмус": "name-purple", "Нано": "name-gold", "Сайтер": "name-gold", "Кёрс": "name-gold",
+                "Гэмбл": "name-gold", "Биоробот": "name-gold", "Ниндзя": "name-gold", "Дипломат": "name-gold", "Экспонент": "name-blue",
+                "Берсерк": "name-red", "Уинди": "name-purple", "Фаермен": "name-purple", "Ёрскуэйк": "name-purple", "Гард": "name-purple",
+                "Инквизитор": "name-gold", "Скелет": "name-gold", "Змея": "name-gold"
+            };
+            return map[name] || "";
         }
 
+        // Инициализация
         function init() {
             if (!loadGameState()) return;
             renderAll();
-            initStickyMenus();
 
-            document.getElementById('move-global-btn1').addEventListener('click', () => globalMove(1));
-            document.getElementById('undo-btn1').addEventListener('click', undo);
-            document.getElementById('undo-turn-btn1').addEventListener('click', undoLastTurn);
-            document.getElementById('end-turn-btn1').addEventListener('click', () => endTurn(1));
-            document.getElementById('kill-btn1').addEventListener('click', () => killEnemy(1));
-            document.getElementById('change-team-btn1').addEventListener('click', changeTeam);
-            document.getElementById('team1-grid').addEventListener('click', (e) => handleGridClick(e, 1));
-
-            document.getElementById('move-global-btn2').addEventListener('click', () => globalMove(2));
-            document.getElementById('undo-btn2').addEventListener('click', undo);
-            document.getElementById('undo-turn-btn2').addEventListener('click', undoLastTurn);
-            document.getElementById('end-turn-btn2').addEventListener('click', () => endTurn(2));
-            document.getElementById('kill-btn2').addEventListener('click', () => killEnemy(2));
-            document.getElementById('change-team-btn2').addEventListener('click', changeTeam);
-            document.getElementById('team2-grid').addEventListener('click', (e) => handleGridClick(e, 2));
-
-            document.getElementById('save-notes-btn').addEventListener('click', saveNotes);
-            loadNotes();
+            // Назначаем обработчики для каждой пары
+            const pairs = ['pair1', 'pair2', 'pairA', 'pairB'];
+            pairs.forEach(p => {
+                document.getElementById(`move-btn-${p}`).addEventListener('click', () => globalMove(p));
+                document.getElementById(`undo-btn-${p}`).addEventListener('click', () => undo(p));
+                document.getElementById(`undo-turn-btn-${p}`).addEventListener('click', () => undoLastTurn(p));
+                document.getElementById(`end-turn-btn-${p}`).addEventListener('click', () => endTurn(p));
+                document.getElementById(`kill-btn-${p}`).addEventListener('click', () => killEnemy(p));
+                document.getElementById(`${p}-grid`).addEventListener('click', (e) => handleGridClick(e, p));
+            });
+            document.getElementById('global-change-team').addEventListener('click', changeTeam);
+            document.getElementById('save-notes-btn').addEventListener('click', () => {
+                localStorage.setItem('notes_4x4', document.getElementById('notes-text').value);
+                alert('Заметки сохранены');
+            });
+            const savedNotes = localStorage.getItem('notes_4x4');
+            if (savedNotes) document.getElementById('notes-text').value = savedNotes;
         }
 
         init();

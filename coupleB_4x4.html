@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Выбор второй команды</title>
+    <title>Выбор пары B (красные)</title>
     <style>
-        /* те же стили, что в team1, но для team2-selected */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a2a3a;
+            background: #1e2f3a;
             color: #eee;
             margin: 0;
             padding: 12px;
@@ -28,7 +27,7 @@
             margin: 0 auto;
         }
         .character-card {
-            background: #2c3e4e;
+            background: #2c4050;
             border-radius: 20px;
             padding: 12px;
             cursor: pointer;
@@ -36,9 +35,9 @@
             border: 2px solid transparent;
         }
         .character-card.team2-selected {
-            border-color: #e63946;
-            background: #2c3e4e;
-            box-shadow: 0 0 12px rgba(230,57,70,0.4);
+    border-color: #e63946;
+    background: #2c4050;
+    box-shadow: 0 0 12px rgba(230,57,70,0.4);
         }
         .character-name {
             font-size: 1.3rem;
@@ -46,7 +45,7 @@
             text-align: center;
             margin-bottom: 10px;
         }
-        /* цветовые классы те же */
+        /* Цвета имён персонажей (те же, что и раньше) */
         .name-cyan { color: #00ffff; }
         .name-pink { color: #ff69b4; }
         .name-green { color: #00ff7f; }
@@ -130,20 +129,19 @@
     </style>
 </head>
 <body>
-    <h1>⚔️ Выберите вторую команду хранителей ⚔️</h1>
+    <h1>🔴 Выберите пару B команды Красных</h1>
     <div id="characters-grid" class="characters-grid"></div>
-    <button id="start-btn">Начать игру</button>
+    <button id="next-btn">Далее</button>
     <div class="footer">
         <strong>ПАМЯТКА:</strong><br>
         Инструкция актуальна для всех способностей, если не указано другое:<br>
         1) Сквозь стены наносить урон нельзя.<br>
         2) Если указано, что способность действует в радиусе какого-то числа клеток, значит её можно использовать только, если до неё можно проложить путь внутри квадрата, образованного этим радиусом.<br>
         3) У всех персонажей максимум 15 хп, кроме Серпенса (18 хп) и Инквизитора (21 хп).<br>
-        4) максимальное число маны команды = 15, за каждый ход добавляется 5 маны.<br>
+        4) максимальное число маны команды = 15, за каждый ход добавляется 5 маны.
     </div>
 
     <script>
-        // Тот же массив characters, что и в team1.html
         const characters = [
     { id: 1, name: "Темпос", hp: 15, abilities: [
         { name: "Самурай", mana: 5, type: "normal", description: "рывок по прямой 2-4 клеток, наносящий всем на своем пути 4 урона." },
@@ -285,7 +283,7 @@
         { name: "У - Медитация", mana: 0, type: "unique", description: "нажимается кнопка Убил Хранителя (используется в ход оппонента)." },
         { name: "П - Энергия", mana: 0, type: "normal", description: "любой Хранитель этой команды перемещается бесплатно по прямой на 1 клетку за ход, пока жив Экспонент." }
     ] }
-]
+];
 
         function getNameColorClass(name) {
             const colorMap = {
@@ -299,6 +297,7 @@
             };
             return colorMap[name] || "";
         }
+
         let selectedIds = [];
 
         function renderCharacters() {
@@ -334,6 +333,10 @@
         function toggleSelection(id) {
             const index = selectedIds.indexOf(id);
             if (index === -1) {
+                if (selectedIds.length >= 2) {
+                    alert('Можно выбрать только 2 персонажа (пару)!');
+                    return;
+                }
                 selectedIds.push(id);
             } else {
                 selectedIds.splice(index, 1);
@@ -341,9 +344,13 @@
             renderCharacters();
         }
 
-        document.getElementById('start-btn').addEventListener('click', () => {
-            localStorage.setItem('team2', JSON.stringify(selectedIds));
-            window.location.href = 'game.html';
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (selectedIds.length !== 2) {
+                alert('Выберите ровно 2 персонажа!');
+                return;
+            }
+            localStorage.setItem('team2_pairB', JSON.stringify(selectedIds));
+            window.location.href = 'couple2_4x4.html';
         });
 
         renderCharacters();

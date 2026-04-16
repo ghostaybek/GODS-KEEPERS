@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Выбор второй команды</title>
+    <title>Выбор первой команды</title>
     <style>
-        /* те же стили, что в team1, но для team2-selected */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,10 +34,10 @@
             transition: transform 0.2s, box-shadow 0.2s;
             border: 2px solid transparent;
         }
-        .character-card.team2-selected {
-            border-color: #e63946;
+        .character-card.team1-selected {
+            border-color: #3a86ff;
             background: #2c3e4e;
-            box-shadow: 0 0 12px rgba(230,57,70,0.4);
+            box-shadow: 0 0 12px rgba(58,134,255,0.4);
         }
         .character-name {
             font-size: 1.3rem;
@@ -46,7 +45,6 @@
             text-align: center;
             margin-bottom: 10px;
         }
-        /* цветовые классы те же */
         .name-cyan { color: #00ffff; }
         .name-pink { color: #ff69b4; }
         .name-green { color: #00ff7f; }
@@ -130,12 +128,12 @@
     </style>
 </head>
 <body>
-    <h1>⚔️ Выберите вторую команду хранителей ⚔️</h1>
+    <h1>⚔️ Выберите первую команду хранителей ⚔️</h1>
     <div id="characters-grid" class="characters-grid"></div>
-    <button id="start-btn">Начать игру</button>
+    <button id="ready-btn">Команда выбрана</button>
     <div class="footer">
         <strong>ПАМЯТКА:</strong><br>
-        Инструкция актуальна для всех способностей, если не указано другое:<br>
+       Инструкция актуальна для всех способностей, если не указано другое:<br>
         1) Сквозь стены наносить урон нельзя.<br>
         2) Если указано, что способность действует в радиусе какого-то числа клеток, значит её можно использовать только, если до неё можно проложить путь внутри квадрата, образованного этим радиусом.<br>
         3) У всех персонажей максимум 15 хп, кроме Серпенса (18 хп) и Инквизитора (21 хп).<br>
@@ -287,6 +285,7 @@
     ] }
 ]
 
+
         function getNameColorClass(name) {
             const colorMap = {
                 "Темпос": "name-cyan", "Гоуст": "name-pink", "Портал": "name-pink", "Иллюжн": "name-pink",
@@ -299,6 +298,7 @@
             };
             return colorMap[name] || "";
         }
+
         let selectedIds = [];
 
         function renderCharacters() {
@@ -306,7 +306,7 @@
             grid.innerHTML = '';
             characters.forEach(char => {
                 const card = document.createElement('div');
-                card.className = `character-card ${selectedIds.includes(char.id) ? 'team2-selected' : ''}`;
+                card.className = `character-card ${selectedIds.includes(char.id) ? 'team1-selected' : ''}`;
                 card.dataset.id = char.id;
                 const colorClass = getNameColorClass(char.name);
                 let abilitiesHtml = '<div class="abilities">';
@@ -341,9 +341,9 @@
             renderCharacters();
         }
 
-        document.getElementById('start-btn').addEventListener('click', () => {
-            localStorage.setItem('team2', JSON.stringify(selectedIds));
-            window.location.href = 'game.html';
+        document.getElementById('ready-btn').addEventListener('click', () => {
+            localStorage.setItem('team1', JSON.stringify(selectedIds));
+            window.location.href = 'team2.html';
         });
 
         renderCharacters();
